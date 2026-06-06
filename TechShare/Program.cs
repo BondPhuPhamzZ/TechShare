@@ -12,7 +12,7 @@ namespace TechShare
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            // Cấu hình Database Context sử dụng SQL Server LocalDB
+            // Add cấu hình Database kết nối với Server
             builder.Services.AddDbContext<TechShareDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -37,7 +37,7 @@ namespace TechShare
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            // Tự động Nạp dữ liệu mẫu (Seed Data) khi khởi động Web
+            // Add Seed Data
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
