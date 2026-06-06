@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using TechShare.Data;
+
 namespace TechShare
 {
     public class Program
@@ -8,6 +11,10 @@ namespace TechShare
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Cấu hình Database Context sử dụng SQL Server LocalDB
+            builder.Services.AddDbContext<TechShareDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
