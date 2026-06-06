@@ -49,7 +49,7 @@
                 </div>
 
                 <!-- Form giả lập hành động -->
-                <form action="/Checkout" method="get">
+                <form action="/Rental/Checkout" method="get">
                     <input type="hidden" name="deviceId" value="@Model.Id" />
                     <div class="row g-2 mb-3">
                         <div class="col-md-6">
@@ -66,7 +66,7 @@
                         <input type="number" class="form-control" name="quantity" min="1" max="@Model.StockQuantity" value="1" required>
                     </div>
                     
-                    <button type="button" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow" onclick="alert('Tính năng đang phát triển ở bước sau!')">
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow">
                         TIẾN HÀNH THUÊ VÀ ĐẶT CỌC
                     </button>
                 </form>

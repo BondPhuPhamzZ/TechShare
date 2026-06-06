@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="~/TechShare.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
+    <header class="sticky-top">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">TechShare</a>
@@ -28,14 +28,14 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-5 mb-5">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - TechShare - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer text-muted fixed-bottom bg-white pt-3 pb-3 shadow">
+        <div class="container text-center fw-bold">
+            &copy; 2026 - TechShare P2P - Mạng lưới Thuê Thiết Bị Công Nghệ Tin Cậy
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

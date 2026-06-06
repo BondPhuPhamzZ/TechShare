@@ -1,0 +1,90 @@
+@model TechShare.Models.Device
+@using TechShare.Enums
+@{
+    ViewData["Title"] = "Thanh toán Đặt cọc";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="fw-bold mb-4">Xác Nhận Đặt Cọc</h2>
+            
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold border-bottom pb-2 mb-3">Thông Tin Thiết Bị</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="@Model.ImageUrl" style="width: 80px; height: 80px; object-fit: cover;" class="rounded me-3" />
+                        <div>
+                            <h5 class="mb-1">@Model.Name</h5>
+                            <span class="text-muted">Chủ máy: @Model.Owner.FullName</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center bg-light rounded p-3 mb-3">
+                        <div class="col">
+                            <small class="text-muted d-block">Ngày nhận máy</small>
+                            <strong>@ViewBag.StartDate.ToString("dd/MM/yyyy")</strong>
+                        </div>
+                        <div class="col border-start border-end">
+                            <small class="text-muted d-block">Ngày trả máy</small>
+                            <strong>@ViewBag.EndDate.ToString("dd/MM/yyyy")</strong>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted d-block">Số lượng</small>
+                            <strong>@ViewBag.Quantity cái</strong>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tiền thuê (@ViewBag.RentDays ngày)</span>
+                        <strong>@ViewBag.TotalPrice.ToString("N0") VNĐ</strong>
+                    </div>
+                    <div class="d-flex justify-content-between text-warning">
+                        <span>Tiền cọc (Bắt buộc)</span>
+                        <strong>@Model.DepositAmount.ToString("N0") VNĐ</strong>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between text-danger fs-5 fw-bold">
+                        <span>Tổng thanh toán lúc này:</span>
+                        <span>@Model.DepositAmount.ToString("N0") VNĐ</span>
+                    </div>
+                </div>
+            </div>
+
+            <form action="/Rental/ConfirmCheckout" method="post">
+                <input type="hidden" name="deviceId" value="@Model.Id" />
+                <input type="hidden" name="startDate" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
+                <input type="hidden" name="endDate" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
+                <input type="hidden" name="quantity" value="@ViewBag.Quantity" />
+                
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold border-bottom pb-2 mb-3">Phương thức nhận hàng</h5>
+                        
+                        <div class="mb-3">
+                            <select class="form-select" name="deliveryMethod" required>
+                                <option value="0">Tự đến lấy (Gặp trực tiếp chủ máy)</option>
+                                <option value="1">Giao hàng tận nơi (Nhập địa chỉ bên dưới)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Địa chỉ nhận hàng (Bỏ trống nếu Tự đến lấy)</label>
+                            <input type="text" class="form-control" name="deliveryAddress" placeholder="Nhập địa chỉ KTX hoặc Phòng trọ của bạn..." />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 bg-primary text-white mb-4">
+                    <div class="card-body text-center p-4">
+                        <h5 class="fw-bold">Thanh toán qua Momo / VNPay (Giả lập)</h5>
+                        <p class="mb-0">Ở đồ án thực tế, đây sẽ là nút chuyển hướng sang cổng thanh toán. Giả định bạn đã quét mã thanh toán <strong>@Model.DepositAmount.ToString("N0") VNĐ</strong> thành công.</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100 py-3 fs-5 fw-bold shadow">
+                    TÔI ĐÃ CHUYỂN KHOẢN CỌC - GỬI YÊU CẦU THUÊ
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
