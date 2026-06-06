@@ -37,6 +37,14 @@ namespace TechShare
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            // Tự động Nạp dữ liệu mẫu (Seed Data) khi khởi động Web
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<TechShareDbContext>();
+                DbInitializer.Initialize(context);
+            }
+
             app.Run();
         }
     }
