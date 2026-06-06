@@ -1,8 +1,59 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model IEnumerable<TechShare.Models.Device>
+@{
+    ViewData["Title"] = "Trang Chủ - Thuê Thiết Bị P2P";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Banner / Jumbotron -->
+<div class="p-5 mb-4 bg-light rounded-3 text-center shadow-sm">
+    <div class="container-fluid py-4">
+        <h1 class="display-5 fw-bold text-primary">TechShare P2P</h1>
+        <p class="col-md-8 mx-auto fs-5 mt-3">
+            Nền tảng thuê thiết bị công nghệ (Laptop, Máy ảnh) uy tín dành cho Sinh viên. 
+            Giải quyết triệt để rủi ro lừa đảo nhờ <strong>Hệ thống Đánh giá Uy tín</strong> và <strong>Chính sách Bảo vệ 2 giờ</strong>.
+        </p>
+        <div class="d-flex justify-content-center mt-4">
+            <input type="text" class="form-control w-50 me-2" placeholder="Tìm kiếm máy ảnh, laptop, cáp sạc..." />
+            <button class="btn btn-primary btn-lg" type="button">Tìm kiếm</button>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h3 class="mb-4 fw-bold">🔥 Thiết Bị Mới Nhất</h3>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 bg-white">
+                    <!-- Ảnh thiết bị -->
+                    <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name" style="height: 250px; object-fit: cover;">
+                    
+                    <div class="card-body">
+                        <span class="badge bg-secondary mb-2">@item.Category.Name</span>
+                        <h5 class="card-title fw-bold text-truncate" title="@item.Name">@item.Name</h5>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-danger fw-bold fs-5">@item.PricePerDay.ToString("N0") VNĐ/Ngày</span>
+                        </div>
+                        
+                        <div class="mt-2 text-muted small">
+                            <span>Kho còn: <strong class="text-success">@item.StockQuantity</strong> cái</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-white border-top-0 pt-0">
+                        <hr />
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="small">
+                                Chủ máy: <strong>@item.Owner.FullName</strong><br/>
+                                Uy tín: <span class="text-warning">⭐ @item.Owner.ReputationScore.ToString("0.0")/5</span>
+                            </div>
+                            <a href="#" class="btn btn-outline-primary btn-sm px-3">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
