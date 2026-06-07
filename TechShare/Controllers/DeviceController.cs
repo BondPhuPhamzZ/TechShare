@@ -22,7 +22,7 @@ namespace TechShare.Controllers
                 .Include(d => d.Owner)
                 .Include(d => d.Category)
                 .Include(d => d.Rentals)
-                    .ThenInclude(r => r.Reviews)
+                    .ThenInclude(r => r.Review)
                         .ThenInclude(rev => rev.Reviewer) // Lấy thông tin người đánh giá
                 .FirstOrDefaultAsync(d => d.Id == id);
 

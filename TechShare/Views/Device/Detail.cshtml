@@ -77,8 +77,8 @@
 
     <!-- KHU VỰC 3: LỊCH SỬ ĐÁNH GIÁ (REVIEW TỪ NGƯỜI THUÊ TRƯỚC) -->
     @{
-        // Rút trích tất cả các đánh giá từ các đơn thuê của thiết bị này
-        var allReviews = Model.Rentals.SelectMany(r => r.Reviews).OrderByDescending(r => r.Id).ToList();
+        // Rút trích tất cả các đánh giá từ các đơn thuê của thiết bị này (Chỉ lấy đơn nào đã có Review)
+        var allReviews = Model.Rentals.Where(r => r.Review != null).Select(r => r.Review).OrderByDescending(r => r.Id).ToList();
     }
     
     <div class="row mt-5">

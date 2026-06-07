@@ -8,6 +8,7 @@ using TechShare.Enums;
 using TechShare.ViewModels;
 
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace TechShare.Controllers
 {

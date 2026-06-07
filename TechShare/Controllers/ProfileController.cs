@@ -64,7 +64,7 @@ namespace TechShare.Controllers
             {
                 if (device.Status == DeviceStatus.Available)
                 {
-                    device.Status = DeviceStatus.Unavailable;
+                    device.Status = DeviceStatus.OutOfStock;
                     device.StockQuantity = 0; // Ẩn khỏi trang chủ
                 }
                 else

@@ -33,5 +33,8 @@ namespace TechShare.Models
 
         public int OwnerId { get; set; }
         public User Owner { get; set; } = null!;
+
+        // Navigation Property: Một thiết bị có thể có nhiều đơn thuê
+        public ICollection<Rental> Rentals { get; set; } = new List<Rental>();
     }
 }

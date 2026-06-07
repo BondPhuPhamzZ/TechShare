@@ -18,6 +18,10 @@ namespace TechShare.Models
         [MaxLength(100)]
         public string FullName { get; set; } = null!;
         
+        [Required]
+        [MaxLength(100)]
+        public string Email { get; set; } = null!;
+        
         [MaxLength(15)]
         public string? PhoneNumber { get; set; }
         
@@ -25,6 +29,8 @@ namespace TechShare.Models
         public string? StudentId { get; set; }
         
         public float ReputationScore { get; set; } = 5.0f;
+        
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation properties
         public ICollection<Device> OwnedDevices { get; set; } = new List<Device>();
