@@ -84,17 +84,6 @@ namespace TechShare.Controllers
 
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
-
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
-                    new Claim(ClaimTypes.Name, newUser.FullName),
-                    new Claim(ClaimTypes.Email, newUser.Email)
-                };
-                var identity = new ClaimsIdentity(claims, "Cookies");
-                await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
-
-                return RedirectToAction("Index", "Home");
             }
             return View(model);
         }
