@@ -85,7 +85,7 @@ namespace TechShare.Controllers
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
             }
-            return View(model);
+            return RedirectToAction("Login", "Home", model);
         }
 
         public async Task<IActionResult> Logout()
