@@ -1,0 +1,165 @@
+@model TechShare.ViewModels.DashboardViewModel
+@using TechShare.Enums
+@{
+    ViewData["Title"] = "Quản lý Đơn Hàng";
+}
+
+<div class="container mt-4 mb-5">
+    <h2 class="fw-bold mb-4">Dashboard Quản Lý Hệ Thống</h2>
+
+    <!-- Bootstrap Nav Tabs để gộp 2 luồng vào chung 1 trang cho sinh viên dễ demo -->
+    <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold fs-5" id="rentals-tab" data-bs-toggle="tab" data-bs-target="#rentals" type="button" role="tab" aria-controls="rentals" aria-selected="true">
+                Luồng KHÁCH: Đơn Đi Thuê Của Tôi
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold text-success fs-5" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="false">
+                Luồng CHỦ: Đơn Cho Thuê Của Tôi
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="dashboardTabsContent">
+        
+        @* KHÁCH THUÊ *@
+        <div class="tab-pane fade show active" id="rentals" role="tabpanel" aria-labelledby="rentals-tab">
+            <div class="alert alert-info mb-4">Mô phỏng góc nhìn của User: <strong>Phạm Gia Phú (đi thuê)</strong></div>
+            
+            @if (!Model.MyRentals.Any())
+            {
+                <div class="alert alert-secondary">Bạn chưa thuê thiết bị nào.</div>
+            }
+            else
+            {
+                <div class="row row-cols-1 g-4">
+                    @foreach (var rental in Model.MyRentals)
+                    {
+                        <div class="col">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-primary">Mã đơn: #@rental.Id</span>
+                                    <span class="badge bg-primary fs-6">@rental.Status</span>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">@rental.Device.Name</h5>
+                                    <p class="text-muted mb-1">Chủ máy: <strong>@rental.Device.Owner.FullName</strong></p>
+                                    <p class="text-muted mb-1">Thuê từ @rental.StartDate.ToString("dd/MM") đến @rental.EndDate.ToString("dd/MM") - Số lượng: @rental.Quantity</p>
+                                    <p class="fw-bold text-danger mb-0">Tiền cọc hệ thống đang giữ: @rental.Device.DepositAmount.ToString("N0") VNĐ</p>
+                                </div>
+                                <div class="card-footer bg-light text-end p-3">
+                                    @if (rental.Status == RentalStatus.Active)
+                                    {
+                                        // Tính thời gian đã trôi qua kể từ lúc giao máy
+                                        var hoursPassed = rental.ActualHandoverTime.HasValue ? (DateTime.Now - rental.ActualHandoverTime.Value).TotalHours : 3;
+                                        
+                                        @if (hoursPassed <= 2)
+                                        {
+                                            <form action="/Dashboard/ReportIssue" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@rental.Id" />
+                                                <button type="submit" class="btn btn-outline-danger shadow-sm" onclick="return confirm('Báo lỗi sẽ đóng băng tiền cọc để admin xử lý. Bạn chắc chứ?')">
+                                                    Báo lỗi (Còn @(Math.Round(2 - hoursPassed, 1)) giờ)
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-secondary disabled shadow-sm" title="Đã quá 2 giờ">Hết hạn báo lỗi</button>
+                                        }
+                                        
+                                        <form action="/Dashboard/ReturnDevice" method="post" class="d-inline ms-2">
+                                            <input type="hidden" name="id" value="@rental.Id" />
+                                            <button type="submit" class="btn btn-primary shadow-sm px-4">Tôi Đã Trả Máy</button>
+                                        </form>
+                                    }
+                                    else if (rental.Status == RentalStatus.Completed)
+                                    {
+                                        <button class="btn btn-warning fw-bold shadow-sm" onclick="alert('Tính năng đánh giá (Review) sẽ được ra mắt ở bước tiếp theo!')">⭐ Đánh giá Chủ máy</button>
+                                    }
+                                    else if (rental.Status == RentalStatus.Pending || rental.Status == RentalStatus.Approved_PendingHandover)
+                                    {
+                                        <span class="text-muted fst-italic">Vui lòng chờ chủ máy xử lý...</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        @* CHỦ MÁY CHO THUÊ *@
+        <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+            <div class="alert alert-success mb-4">Mô phỏng góc nhìn của User: <strong>Huỳnh Anh Đức (người cho thuê)</strong></div>
+            
+            @if (!Model.MyOrders.Any())
+            {
+                <div class="alert alert-secondary">Chưa có ai thuê thiết bị của bạn.</div>
+            }
+            else
+            {
+                <div class="row row-cols-1 g-4">
+                    @foreach (var order in Model.MyOrders)
+                    {
+                        <div class="col">
+                            <div class="card shadow-sm border-0 border-start border-4 border-success">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-success">Mã đơn: #@order.Id</span>
+                                    <span class="badge bg-success fs-6">@order.Status</span>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">@order.Device.Name</h5>
+                                    <p class="text-muted mb-1">Khách muốn thuê: <strong>@order.Renter.FullName</strong></p>
+                                    <p class="text-muted mb-1">Thời gian: @order.StartDate.ToString("dd/MM") đến @order.EndDate.ToString("dd/MM") - Số lượng: @order.Quantity</p>
+                                    <p class="fw-bold text-warning mb-0">Tiền cọc hệ thống đang giữ: @order.Device.DepositAmount.ToString("N0") VNĐ</p>
+                                </div>
+                                <div class="card-footer bg-light text-end p-3">
+                                    @if (order.Status == RentalStatus.Pending)
+                                    {
+                                        <form action="/Dashboard/ApproveOrder" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@order.Id" />
+                                            <button type="submit" class="btn btn-success shadow-sm px-4">Duyệt Đơn</button>
+                                        </form>
+                                    }
+                                    else if (order.Status == RentalStatus.Approved_PendingHandover)
+                                    {
+                                        <form action="/Dashboard/Handover" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@order.Id" />
+                                            <button type="submit" class="btn btn-primary shadow-sm px-4" onclick="return confirm('Xác nhận bạn ĐÃ GIAO MÁY tận tay? Việc này sẽ bắt đầu đếm ngược 2 tiếng báo lỗi của khách.')">Xác nhận Đã Giao Máy</button>
+                                        </form>
+                                    }
+                                    else if (order.Status == RentalStatus.Returned_PendingInspection)
+                                    {
+                                        <form action="/Dashboard/CompleteOrder" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@order.Id" />
+                                            <button type="submit" class="btn btn-success shadow-sm px-4">Đã nhận lại máy & Hoàn cọc (Hoàn thành)</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                         <span class="text-muted fst-italic">Vui lòng chờ khách xử lý...</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Kích hoạt Bootstrap Tabs -->
+@section Scripts {
+    <script>
+        var triggerTabList = [].slice.call(document.querySelectorAll('#dashboardTabs button'))
+        triggerTabList.forEach(function (triggerEl) {
+          var tabTrigger = new bootstrap.Tab(triggerEl)
+          triggerEl.addEventListener('click', function (event) {
+            event.preventDefault()
+            tabTrigger.show()
+          })
+        })
+    </script>
+}
