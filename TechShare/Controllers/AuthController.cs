@@ -85,6 +85,7 @@ namespace TechShare.Controllers
                 {
                     FullName = model.FullName,
                     Email = model.Email,
+                    Username = model.Email, // [FIX LỖI DB]: Cột Username là Required nhưng trước đó chưa được gán
                     PhoneNumber = model.PhoneNumber,
                     // THỰC TẾ: Phải băm mật khẩu (Hash). Trong đồ án demo ta lưu text tĩnh.
                     PasswordHash = model.Password, 

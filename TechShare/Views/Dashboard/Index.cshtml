@@ -86,7 +86,7 @@
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@rental.Id" />
                                                 <button type="submit" class="btn btn-outline-danger shadow-sm" onclick="return confirm('Báo lỗi sẽ đóng băng tiền cọc để admin xử lý. Bạn chắc chứ?')">
-                                                    ⚠️ Báo lỗi (Còn @(Math.Round(2 - hoursPassed, 1)) giờ)
+                                                    Báo lỗi (Còn @(Math.Round(2 - hoursPassed, 1)) giờ)
                                                 </button>
                                             </form>
                                         }
