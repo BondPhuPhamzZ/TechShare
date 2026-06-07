@@ -119,5 +119,34 @@ namespace TechShare.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        // 6. Xử lý Tranh Chấp: Chủ máy chấp nhận lỗi -> Hủy đơn & Hoàn Cọc
+        [HttpPost]
+        public async Task<IActionResult> ResolveDisputeRefund(int id)
+        {
+            var rental = await _context.Rentals.Include(r => r.Device).FirstOrDefaultAsync(r => r.Id == id);
+            if (rental != null && rental.Status == RentalStatus.Disputed)
+            {
+                rental.Status = RentalStatus.Cancelled; // Đơn bị hủy do lỗi
+                rental.DepositStatus = DepositStatus.Refunded; // Trả lại cọc cho sinh viên
+                rental.Device.StockQuantity += rental.Quantity; // Cập nhật lại kho
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
+        }
+
+        // 7. Xử lý Tranh Chấp: Chủ máy xác định lỗi do khách làm hỏng -> Giữ cọc
+        [HttpPost]
+        public async Task<IActionResult> ResolveDisputeRetain(int id)
+        {
+            var rental = await _context.Rentals.FirstOrDefaultAsync(r => r.Id == id);
+            if (rental != null && rental.Status == RentalStatus.Disputed)
+            {
+                rental.Status = RentalStatus.Completed; // Vẫn đóng đơn
+                rental.DepositStatus = DepositStatus.Retained; // Tịch thu cọc của khách
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
+        }
     }
 }

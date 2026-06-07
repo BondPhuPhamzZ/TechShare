@@ -1,0 +1,44 @@
+@model TechShare.Models.Rental
+@{
+    ViewData["Title"] = "Đánh Giá Uy Tín Chủ Máy";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark text-center fw-bold fs-5 py-3">
+                    ĐÁNH GIÁ UY TÍN CHỦ MÁY
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-center text-muted mb-4">Bạn vừa hoàn thành việc thuê <strong>@Model.Device.Name</strong>. Để xây dựng cộng đồng TechShare P2P minh bạch, hãy đánh giá mức độ uy tín của chủ máy <strong>@Model.Device.Owner.FullName</strong> nhé!</p>
+                    
+                    <form action="/Review/SubmitReview" method="post">
+                        <input type="hidden" name="rentalId" value="@Model.Id" />
+                        
+                        <div class="mb-4 text-center bg-light p-3 rounded">
+                            <label class="form-label fw-bold d-block mb-3 fs-5">Điểm đánh giá</label>
+                            <select class="form-select w-75 mx-auto text-center fw-bold text-warning fs-5 shadow-sm" name="rating" required>
+                                <option value="5" selected>⭐⭐⭐⭐⭐ (5 - Rất tốt)</option>
+                                <option value="4">⭐⭐⭐⭐ (4 - Tốt)</option>
+                                <option value="3">⭐⭐⭐ (3 - Bình thường)</option>
+                                <option value="2">⭐⭐ (2 - Tệ)</option>
+                                <option value="1">⭐ (1 - Rất tệ / Lừa đảo)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Nhận xét của bạn (Mọi người sẽ đọc được)</label>
+                            <textarea class="form-control" name="comment" rows="4" placeholder="Ví dụ: Máy dùng tốt, đúng như mô tả. Anh chủ hỗ trợ nhiệt tình..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="/Dashboard/Index" class="btn btn-outline-secondary px-4 py-2">Bỏ qua</a>
+                            <button type="submit" class="btn btn-warning fw-bold fs-5 px-4 py-2 shadow-sm">GỬI ĐÁNH GIÁ</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

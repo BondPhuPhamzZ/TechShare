@@ -4,6 +4,32 @@
     ViewData["Title"] = "Quản lý Đơn Hàng";
 }
 
+@functions {
+    // Hàm Helper giúp dịch trạng thái tiếng Anh sang Tiếng Việt hiển thị cho sinh viên dễ hiểu
+    public string TranslateStatus(RentalStatus status) {
+        return status switch {
+            RentalStatus.Pending => "Chờ duyệt",
+            RentalStatus.Approved_PendingHandover => "Chờ giao máy",
+            RentalStatus.Active => "Đang thuê",
+            RentalStatus.Returned_PendingInspection => "Chờ kiểm tra máy",
+            RentalStatus.Completed => "Hoàn thành",
+            RentalStatus.Disputed => "Tranh chấp / Máy Lỗi",
+            RentalStatus.Cancelled => "Đã hủy",
+            _ => status.ToString()
+        };
+    }
+    
+    public string TranslateDeposit(DepositStatus dStatus) {
+        return dStatus switch {
+            DepositStatus.Pending => "Chưa cọc",
+            DepositStatus.Paid => "Hệ thống đang giữ",
+            DepositStatus.Refunded => "Đã hoàn cọc",
+            DepositStatus.Retained => "Chủ máy giữ cọc đền bù",
+            _ => dStatus.ToString()
+        };
+    }
+}
+
 <div class="container mt-4 mb-5">
     <h2 class="fw-bold mb-4">Dashboard Quản Lý Hệ Thống</h2>
 
@@ -40,13 +66,13 @@
                             <div class="card shadow-sm border-0">
                                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                     <span class="fw-bold text-primary">Mã đơn: #@rental.Id</span>
-                                    <span class="badge bg-primary fs-6">@rental.Status</span>
+                                    <span class="badge bg-primary fs-6">@TranslateStatus(rental.Status)</span>
                                 </div>
                                 <div class="card-body">
                                     <h5 class="card-title fw-bold">@rental.Device.Name</h5>
-                                    <p class="text-muted mb-1">Chủ máy: <strong>@rental.Device.Owner.FullName</strong></p>
+                                    <p class="text-muted mb-1">Chủ máy: <strong>@rental.Device.Owner.FullName</strong> (SĐT: @rental.Device.Owner.PhoneNumber)</p>
                                     <p class="text-muted mb-1">Thuê từ @rental.StartDate.ToString("dd/MM") đến @rental.EndDate.ToString("dd/MM") - Số lượng: @rental.Quantity</p>
-                                    <p class="fw-bold text-danger mb-0">Tiền cọc hệ thống đang giữ: @rental.Device.DepositAmount.ToString("N0") VNĐ</p>
+                                    <p class="fw-bold text-danger mb-0">Tiền cọc: @rental.Device.DepositAmount.ToString("N0") VNĐ - Tình trạng: @TranslateDeposit(rental.DepositStatus)</p>
                                 </div>
                                 <div class="card-footer bg-light text-end p-3">
                                     @if (rental.Status == RentalStatus.Active)
@@ -73,9 +99,13 @@
                                             <button type="submit" class="btn btn-primary shadow-sm px-4">Tôi Đã Trả Máy</button>
                                         </form>
                                     }
+                                    else if (rental.Status == RentalStatus.Disputed)
+                                    {
+                                        <span class="text-danger fw-bold d-block mb-2">Đã báo lỗi hệ thống! Vui lòng gọi SĐT chủ máy để thỏa thuận.</span>
+                                    }
                                     else if (rental.Status == RentalStatus.Completed)
                                     {
-                                        <button class="btn btn-warning fw-bold shadow-sm" onclick="alert('Tính năng đánh giá (Review) sẽ được ra mắt ở bước tiếp theo!')">⭐ Đánh giá Chủ máy</button>
+                                        <a href="/Review/Create?rentalId=@rental.Id" class="btn btn-warning fw-bold shadow-sm">⭐ Đánh giá Chủ máy</a>
                                     }
                                     else if (rental.Status == RentalStatus.Pending || rental.Status == RentalStatus.Approved_PendingHandover)
                                     {
@@ -106,13 +136,13 @@
                             <div class="card shadow-sm border-0 border-start border-4 border-success">
                                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                     <span class="fw-bold text-success">Mã đơn: #@order.Id</span>
-                                    <span class="badge bg-success fs-6">@order.Status</span>
+                                    <span class="badge bg-success fs-6">@TranslateStatus(order.Status)</span>
                                 </div>
                                 <div class="card-body">
                                     <h5 class="card-title fw-bold">@order.Device.Name</h5>
-                                    <p class="text-muted mb-1">Khách muốn thuê: <strong>@order.Renter.FullName</strong></p>
+                                    <p class="text-muted mb-1">Khách muốn thuê: <strong>@order.Renter.FullName</strong> (SĐT: @order.Renter.PhoneNumber)</p>
                                     <p class="text-muted mb-1">Thời gian: @order.StartDate.ToString("dd/MM") đến @order.EndDate.ToString("dd/MM") - Số lượng: @order.Quantity</p>
-                                    <p class="fw-bold text-warning mb-0">Tiền cọc hệ thống đang giữ: @order.Device.DepositAmount.ToString("N0") VNĐ</p>
+                                    <p class="fw-bold text-warning mb-0">Tiền cọc: @order.Device.DepositAmount.ToString("N0") VNĐ - Tình trạng: @TranslateDeposit(order.DepositStatus)</p>
                                 </div>
                                 <div class="card-footer bg-light text-end p-3">
                                     @if (order.Status == RentalStatus.Pending)
@@ -133,7 +163,21 @@
                                     {
                                         <form action="/Dashboard/CompleteOrder" method="post" class="d-inline">
                                             <input type="hidden" name="id" value="@order.Id" />
-                                            <button type="submit" class="btn btn-success shadow-sm px-4">Đã nhận lại máy & Hoàn cọc (Hoàn thành)</button>
+                                            <button type="submit" class="btn btn-success shadow-sm px-4">Đã nhận lại máy nguyên vẹn & Hoàn cọc (Hoàn thành)</button>
+                                        </form>
+                                    }
+                                    else if (order.Status == RentalStatus.Disputed)
+                                    {
+                                        <div class="alert alert-danger text-start small mb-2">Khách đã bấm Báo lỗi. Vui lòng liên hệ và kiểm tra máy. Quyền quyết định Tiền cọc thuộc về bạn.</div>
+                                        
+                                        <form action="/Dashboard/ResolveDisputeRefund" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@order.Id" />
+                                            <button type="submit" class="btn btn-outline-success btn-sm shadow-sm" onclick="return confirm('Xác nhận máy bị lỗi và HỦY ĐƠN + TRẢ CỌC cho khách?')">Chấp nhận Lỗi (Hoàn cọc)</button>
+                                        </form>
+
+                                        <form action="/Dashboard/ResolveDisputeRetain" method="post" class="d-inline ms-2">
+                                            <input type="hidden" name="id" value="@order.Id" />
+                                            <button type="submit" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('Xác nhận lỗi do KHÁCH LÀM HỎNG? Tiền cọc sẽ bị tịch thu chuyển cho bạn.')">Tịch thu Cọc (Khách làm hỏng)</button>
                                         </form>
                                     }
                                     else
