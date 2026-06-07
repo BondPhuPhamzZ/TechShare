@@ -19,26 +19,21 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        // GET: /Auth/Login
         public IActionResult Login()
         {
-            // Trả về giao diện đăng nhập cho người dùng
             return View(new LoginViewModel());
         }
 
-        // POST: Xử lý Đăng nhập
         [HttpPost]
-        [ValidateAntiForgeryToken] // CHỐNG CSRF: Bắt buộc form gửi lên phải có thẻ ẩn tương ứng
+        [ValidateAntiForgeryToken] 
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Kiểm tra DB xem user có tồn tại không
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.PasswordHash == model.Password);
                 
                 if (user != null)
                 {
-                    // Đăng nhập thành công -> Tạo thẻ chứng minh thư (Claims)
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -49,7 +44,6 @@ namespace TechShare.Controllers
                     var identity = new ClaimsIdentity(claims, "Cookies");
                     var principal = new ClaimsPrincipal(identity);
 
-                    // Đóng dấu cấp Cookie cho trình duyệt
                     await HttpContext.SignInAsync("Cookies", principal);
 
                     return RedirectToAction("Index", "Home");
@@ -60,20 +54,17 @@ namespace TechShare.Controllers
             return View(model);
         }
 
-        // GET: /Auth/Register
         public IActionResult Register()
         {
             return View(new RegisterViewModel());
         }
 
-        // POST: Xử lý Đăng ký
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Kiểm tra email trùng
                 bool isExist = await _context.Users.AnyAsync(u => u.Email == model.Email);
                 if (isExist)
                 {
@@ -85,17 +76,15 @@ namespace TechShare.Controllers
                 {
                     FullName = model.FullName,
                     Email = model.Email,
-                    Username = model.Email, // [FIX LỖI DB]: Cột Username là Required nhưng trước đó chưa được gán
+                    Username = model.Email, 
                     PhoneNumber = model.PhoneNumber,
-                    // THỰC TẾ: Phải băm mật khẩu (Hash). Trong đồ án demo ta lưu text tĩnh.
                     PasswordHash = model.Password, 
-                    ReputationScore = 5.0f // Tặng 5 sao khởi điểm cho tài khoản mới
+                    ReputationScore = 5.0f 
                 };
 
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
 
-                // Đăng ký xong tự động đăng nhập luôn
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
@@ -110,7 +99,6 @@ namespace TechShare.Controllers
             return View(model);
         }
 
-        // Đăng xuất
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("Cookies");
