@@ -84,8 +84,12 @@ namespace TechShare.Controllers
 
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
+                
+                TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
+                return RedirectToAction("Login"); // Chuyển về hàm Login của chính AuthController
             }
-            return RedirectToAction("Login", "Home", model);
+            // Nếu Validation lỗi, trả về trang hiện tại kèm các thông báo lỗi
+            return View(model);
         }
 
         public async Task<IActionResult> Logout()

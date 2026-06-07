@@ -10,6 +10,13 @@
                 <div class="card-body p-5">
                     <h2 class="text-center fw-bold text-primary mb-4">Đăng Nhập</h2>
                     
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success text-center shadow-sm">
+                            <strong>@TempData["SuccessMessage"]</strong>
+                        </div>
+                    }
+
                     <form asp-action="Login" method="post">
                         @Html.AntiForgeryToken()
                         
