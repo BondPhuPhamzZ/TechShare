@@ -1,0 +1,50 @@
+@model TechShare.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-body p-5">
+                    <h2 class="text-center fw-bold text-primary mb-4">Đăng Nhập</h2>
+                    
+                    <form asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email của bạn</label>
+                            <input asp-for="Email" class="form-control form-control-lg" placeholder="nguyenkhachthue@gmail.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Mật khẩu</label>
+                            <input asp-for="Password" class="form-control form-control-lg" placeholder="******" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow-sm">ĐĂNG NHẬP NGAY</button>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted">Chưa có tài khoản? <a asp-action="Register" class="text-decoration-none fw-bold">Tạo tài khoản mới</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-4 small">
+                <strong>Gợi ý tài khoản test (Dữ liệu mẫu):</strong><br/>
+                - Khách thuê: <em>nguyenkhachthue@gmail.com</em> / Pass: <em>123456</em><br/>
+                - Chủ máy: <em>tranvanchu@gmail.com</em> / Pass: <em>123456</em>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

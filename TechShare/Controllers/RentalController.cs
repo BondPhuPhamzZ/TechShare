@@ -6,8 +6,12 @@ using TechShare.Models;
 using System;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
 namespace TechShare.Controllers
 {
+    [Authorize]
     public class RentalController : Controller
     {
         private readonly TechShareDbContext _context;
@@ -43,8 +47,11 @@ namespace TechShare.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmCheckout(int deviceId, DateTime startDate, DateTime endDate, int quantity, string deliveryAddress, DeliveryMethod deliveryMethod)
         {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            
             var device = await _context.Devices.FindAsync(deviceId);
             if (device == null) 
                 return NotFound();
@@ -56,8 +63,7 @@ namespace TechShare.Controllers
             var rental = new Rental
             {
                 DeviceId = deviceId,
-                // Hardcode ID của Khách Thuê (Seeded data Id = 2) vì hiện tại chưa code chức năng Login
-                RenterId = 2, 
+                RenterId = userId, // Đã lấy từ ID thật đăng nhập
                 StartDate = startDate,
                 EndDate = endDate,
                 Quantity = quantity,

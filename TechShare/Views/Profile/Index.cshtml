@@ -1,0 +1,133 @@
+@model TechShare.ViewModels.ProfileViewModel
+@using TechShare.Enums
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+
+@functions {
+    public string TranslateStatus(RentalStatus status) {
+        return status switch {
+            RentalStatus.Pending => "Chờ duyệt",
+            RentalStatus.Approved_PendingHandover => "Chờ giao máy",
+            RentalStatus.Active => "Đang thuê",
+            RentalStatus.Returned_PendingInspection => "Chờ kiểm tra",
+            RentalStatus.Disputed => "Đang Tranh chấp",
+            _ => status.ToString()
+        };
+    }
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <!-- Cột Trái: Thông tin User -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <img src="https://ui-avatars.com/api/?name=@Model.UserInfo.FullName&background=random&size=150" class="rounded-circle mx-auto mb-3 shadow" alt="Avatar" style="width: 150px;">
+                <h4 class="fw-bold mb-1">@Model.UserInfo.FullName</h4>
+                <p class="text-muted mb-2">@Model.UserInfo.Email</p>
+                <div class="badge bg-warning text-dark fs-6 mb-3 px-3 py-2">
+                    Uy tín: ⭐ @Model.UserInfo.ReputationScore.ToString("0.0") / 5.0
+                </div>
+                <hr />
+                <p class="text-start mb-1"><small class="text-muted">Số điện thoại:</small> <strong>@Model.UserInfo.PhoneNumber</strong></p>
+                <p class="text-start"><small class="text-muted">Ngày tham gia:</small> <strong>@Model.UserInfo.CreatedAt.ToString("dd/MM/yyyy")</strong></p>
+                <button class="btn btn-outline-primary w-100 mt-2">Chỉnh sửa hồ sơ</button>
+            </div>
+        </div>
+
+        <!-- Cột Phải: Quản lý Tài sản -->
+        <div class="col-md-8">
+            <!-- Khu vực 1: Máy đang đem cho thuê (Bài đăng) -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white fw-bold fs-5 text-primary py-3">
+                    📦 Máy Tính / Camera Của Tôi (Bài Đăng)
+                </div>
+                <div class="card-body">
+                    @if (!Model.MyPostedDevices.Any())
+                    {
+                        <p class="text-muted text-center my-3">Bạn chưa đăng thiết bị nào lên sàn.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach(var device in Model.MyPostedDevices)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@device.ImageUrl" style="width: 60px; height: 60px; object-fit: cover;" class="rounded me-3" />
+                                        <div>
+                                            <h6 class="fw-bold mb-1">@device.Name</h6>
+                                            <span class="text-danger small fw-bold">@device.PricePerDay.ToString("N0") đ/ngày</span>
+                                            @if(device.Status == DeviceStatus.Available) {
+                                                <span class="badge bg-success ms-2">Đang Hiển Thị</span>
+                                            } else {
+                                                <span class="badge bg-secondary ms-2">Đã Tạm Ẩn</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <form asp-action="ToggleDeviceStatus" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="deviceId" value="@device.Id" />
+                                            @if(device.Status == DeviceStatus.Available) {
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm" onclick="return confirm('Tạm ẩn máy này khỏi Trang chủ? Mình không cho thuê nữa.')">Tạm Ẩn</button>
+                                            } else {
+                                                <button type="submit" class="btn btn-success btn-sm">Hiện Lại (Cho thuê)</button>
+                                            }
+                                        </form>
+                                        <a href="/Device/Detail/@device.Id" class="btn btn-outline-primary btn-sm ms-1">Xem</a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Khu vực 2: Máy đang đi mượn -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white fw-bold fs-5 text-warning py-3">
+                    ⚡ Tài Sản Đang Cầm (Đi Thuê)
+                </div>
+                <div class="card-body">
+                    @if (!Model.MyActiveRentals.Any())
+                    {
+                        <p class="text-muted text-center my-3">Bạn đang không mượn thiết bị nào.</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Thiết bị</th>
+                                        <th>Chủ máy</th>
+                                        <th>Hạn trả</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(var rental in Model.MyActiveRentals)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@rental.Device.Name</td>
+                                            <td>@rental.Device.Owner.FullName</td>
+                                            <td class="text-danger fw-bold">@rental.EndDate.ToString("dd/MM")</td>
+                                            <td><span class="badge bg-info text-dark">@TranslateStatus(rental.Status)</span></td>
+                                            <td><a href="/Dashboard" class="btn btn-sm btn-primary">Xử lý ngay</a></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted fst-italic">Vào tab Dashboard để thao tác báo lỗi / trả máy.</small>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

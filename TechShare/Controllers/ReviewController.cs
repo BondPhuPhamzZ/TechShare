@@ -6,8 +6,12 @@ using TechShare.Enums;
 using System.Threading.Tasks;
 using System.Linq;
 
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+
 namespace TechShare.Controllers
 {
+    [Authorize]
     public class ReviewController : Controller
     {
         private readonly TechShareDbContext _context;
@@ -41,8 +45,11 @@ namespace TechShare.Controllers
 
         // POST: Xử lý lưu Đánh giá và Tính lại Uy tín cho Chủ máy
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitReview(int rentalId, int rating, string comment)
         {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            
             var rental = await _context.Rentals
                 .Include(r => r.Device)
                 .ThenInclude(d => d.Owner)
@@ -56,7 +63,7 @@ namespace TechShare.Controllers
                 RentalId = rentalId,
                 Rating = rating,
                 Comment = comment,
-                ReviewerId = 2, // Hardcode Khách Thuê ID = 2
+                ReviewerId = userId, // Lấy từ Cookie
                 RevieweeId = rental.Device.OwnerId // Đánh giá Chủ máy
             };
 

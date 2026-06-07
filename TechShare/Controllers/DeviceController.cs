@@ -17,10 +17,13 @@ namespace TechShare.Controllers
         // Dùng chuẩn Async/Await cho tính năng Chi tiết thiết bị
         public async Task<IActionResult> Detail(int id)
         {
-            // Truy vấn lấy thiết bị kèm Chủ máy và Danh mục
+            // Truy vấn lấy thiết bị kèm Chủ máy, Danh mục và toàn bộ Đơn thuê -> Đánh giá (Reviews)
             var device = await _context.Devices
                 .Include(d => d.Owner)
                 .Include(d => d.Category)
+                .Include(d => d.Rentals)
+                    .ThenInclude(r => r.Reviews)
+                        .ThenInclude(rev => rev.Reviewer) // Lấy thông tin người đánh giá
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (device == null)

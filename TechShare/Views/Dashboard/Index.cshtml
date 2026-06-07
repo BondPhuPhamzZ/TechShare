@@ -83,9 +83,10 @@
                                         @if (hoursPassed <= 2)
                                         {
                                             <form action="/Dashboard/ReportIssue" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@rental.Id" />
                                                 <button type="submit" class="btn btn-outline-danger shadow-sm" onclick="return confirm('Báo lỗi sẽ đóng băng tiền cọc để admin xử lý. Bạn chắc chứ?')">
-                                                    Báo lỗi (Còn @(Math.Round(2 - hoursPassed, 1)) giờ)
+                                                    ⚠️ Báo lỗi (Còn @(Math.Round(2 - hoursPassed, 1)) giờ)
                                                 </button>
                                             </form>
                                         }
@@ -95,8 +96,18 @@
                                         }
                                         
                                         <form action="/Dashboard/ReturnDevice" method="post" class="d-inline ms-2">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@rental.Id" />
                                             <button type="submit" class="btn btn-primary shadow-sm px-4">Tôi Đã Trả Máy</button>
+                                        </form>
+                                    }
+                                    else if (rental.Status == RentalStatus.PendingRenterConfirmation)
+                                    {
+                                        <div class="alert alert-warning text-start small mb-2">Chủ máy đang giao thiết bị cho bạn. Hãy KIỂM TRA MÁY, QUAY VIDEO LẠI và xác nhận nhận máy dưới đây.</div>
+                                        <form action="/Dashboard/ConfirmHandover" method="post" class="d-inline ms-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@rental.Id" />
+                                            <button type="submit" class="btn btn-success shadow-sm px-4" onclick="return confirm('XÁC NHẬN BẠN ĐÃ CẦM MÁY VÀ TEST NGOẠI HÌNH OK? Thời gian bảo vệ 2 Giờ sẽ bắt đầu chạy ngay lập tức.')">Tôi Đã Nhận & Test Máy (Bắt đầu thuê)</button>
                                         </form>
                                     }
                                     else if (rental.Status == RentalStatus.Disputed)
@@ -148,6 +159,7 @@
                                     @if (order.Status == RentalStatus.Pending)
                                     {
                                         <form action="/Dashboard/ApproveOrder" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@order.Id" />
                                             <button type="submit" class="btn btn-success shadow-sm px-4">Duyệt Đơn</button>
                                         </form>
@@ -155,13 +167,19 @@
                                     else if (order.Status == RentalStatus.Approved_PendingHandover)
                                     {
                                         <form action="/Dashboard/Handover" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@order.Id" />
-                                            <button type="submit" class="btn btn-primary shadow-sm px-4" onclick="return confirm('Xác nhận bạn ĐÃ GIAO MÁY tận tay? Việc này sẽ bắt đầu đếm ngược 2 tiếng báo lỗi của khách.')">Xác nhận Đã Giao Máy</button>
+                                            <button type="submit" class="btn btn-primary shadow-sm px-4" onclick="return confirm('Bạn đang mang máy đi giao? Đợi khách test xong và xác nhận trên máy của khách nhé!')">Mang máy đi giao</button>
                                         </form>
+                                    }
+                                    else if (order.Status == RentalStatus.PendingRenterConfirmation)
+                                    {
+                                        <span class="text-warning fw-bold fst-italic">Đang đợi Khách test và Xác nhận nhận máy...</span>
                                     }
                                     else if (order.Status == RentalStatus.Returned_PendingInspection)
                                     {
                                         <form action="/Dashboard/CompleteOrder" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@order.Id" />
                                             <button type="submit" class="btn btn-success shadow-sm px-4">Đã nhận lại máy nguyên vẹn & Hoàn cọc (Hoàn thành)</button>
                                         </form>
@@ -171,11 +189,13 @@
                                         <div class="alert alert-danger text-start small mb-2">Khách đã bấm Báo lỗi. Vui lòng liên hệ và kiểm tra máy. Quyền quyết định Tiền cọc thuộc về bạn.</div>
                                         
                                         <form action="/Dashboard/ResolveDisputeRefund" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@order.Id" />
                                             <button type="submit" class="btn btn-outline-success btn-sm shadow-sm" onclick="return confirm('Xác nhận máy bị lỗi và HỦY ĐƠN + TRẢ CỌC cho khách?')">Chấp nhận Lỗi (Hoàn cọc)</button>
                                         </form>
 
                                         <form action="/Dashboard/ResolveDisputeRetain" method="post" class="d-inline ms-2">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@order.Id" />
                                             <button type="submit" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('Xác nhận lỗi do KHÁCH LÀM HỎNG? Tiền cọc sẽ bị tịch thu chuyển cho bạn.')">Tịch thu Cọc (Khách làm hỏng)</button>
                                         </form>
