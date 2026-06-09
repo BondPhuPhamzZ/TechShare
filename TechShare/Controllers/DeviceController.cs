@@ -14,10 +14,8 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        // Dùng chuẩn Async/Await cho tính năng Chi tiết thiết bị
         public async Task<IActionResult> Detail(int id)
         {
-            // Truy vấn lấy thiết bị kèm Chủ máy, Danh mục và toàn bộ Đơn thuê -> Đánh giá (Reviews)
             var device = await _context.Devices
                 .Include(d => d.Owner)
                 .Include(d => d.Category)

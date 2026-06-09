@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace TechShare.Controllers
 {
-    [Authorize] // Bắt buộc phải đăng nhập
+    [Authorize] 
     public class DashboardController : Controller
     {
         private readonly TechShareDbContext _context;
@@ -22,15 +22,16 @@ namespace TechShare.Controllers
             _context = context;
         }
 
+        // Luồng xử lý Dashboard giữa ng thuê và ng cho thuê
         public async Task<IActionResult> Index()
         {
-            // Lấy ID thật của người đang đăng nhập
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) return RedirectToAction("Login", "Auth");
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) 
+                return RedirectToAction("Login", "Auth");
 
             var viewModel = new DashboardViewModel();
 
-            // 1. Lấy Đơn mình ĐI THUÊ
+            // Đơn đi thuê
             viewModel.MyRentals = await _context.Rentals
                 .Include(r => r.Device)
                 .ThenInclude(d => d.Owner)
@@ -38,7 +39,7 @@ namespace TechShare.Controllers
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
 
-            // 2. Lấy Đơn người khác THUÊ MÁY CỦA MÌNH
+            // Đơn cho thuê
             viewModel.MyOrders = await _context.Rentals
                 .Include(r => r.Device)
                 .Include(r => r.Renter)
@@ -49,8 +50,7 @@ namespace TechShare.Controllers
             return View(viewModel);
         }
 
-
-        // 1. Chủ máy Duyệt đơn
+        // Chủ máy duyệt đơn
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ApproveOrder(int id)
@@ -64,7 +64,7 @@ namespace TechShare.Controllers
             return RedirectToAction("Index");
         }
 
-        // 2. Chủ máy xác nhận mang máy đi giao -> Chờ khách đồng kiểm
+        // Chủ máy -> mang máy đi giao
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Handover(int id)
@@ -72,14 +72,14 @@ namespace TechShare.Controllers
             var rental = await _context.Rentals.FindAsync(id);
             if (rental != null && rental.Status == RentalStatus.Approved_PendingHandover)
             {
-                // BƯỚC CẢI TIẾN: Thay vì kích hoạt ngay, ta chuyển sang trạng thái chờ Khách xác nhận
+                // chờ khách xác nhận
                 rental.Status = RentalStatus.PendingRenterConfirmation; 
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
         }
 
-        // 2.5 Khách xác nhận ĐÃ TEST MÁY & NHẬN -> Kích hoạt 2H
+        // Khách đã test xong và xác nhận -> Bắt đầu tính 2h
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmHandover(int id)
@@ -88,13 +88,13 @@ namespace TechShare.Controllers
             if (rental != null && rental.Status == RentalStatus.PendingRenterConfirmation)
             {
                 rental.Status = RentalStatus.Active;
-                rental.ActualHandoverTime = DateTime.Now; // CHÍNH THỨC kích hoạt bộ đếm 2H
+                rental.ActualHandoverTime = DateTime.Now; 
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
         }
 
-        // 3. Khách thuê Báo lỗi (Chỉ được phép trong 2H đầu)
+        // Khách thuê báo lỗi (chỉ dc phép trong 2h đầu)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReportIssue(int id)
@@ -112,7 +112,7 @@ namespace TechShare.Controllers
             return RedirectToAction("Index");
         }
 
-        // 4. Khách thuê Trả máy
+        // Khách thuê trả máy
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReturnDevice(int id)
@@ -126,7 +126,7 @@ namespace TechShare.Controllers
             return RedirectToAction("Index");
         }
 
-        // 5. Chủ máy Xác nhận nhận lại máy & Hoàn cọc (Kết thúc vòng đời)
+        // Chủ máy xác nhận đã nhận lại máy và hoàn cọc
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteOrder(int id)
@@ -137,16 +137,17 @@ namespace TechShare.Controllers
                 rental.Status = RentalStatus.Completed;
                 rental.DepositStatus = DepositStatus.Refunded;
                 
-                // Trả lại số lượng tồn kho lên sàn
                 rental.Device.StockQuantity += rental.Quantity;
-                if (rental.Device.StockQuantity > 0) rental.Device.Status = DeviceStatus.Available;
+
+                if (rental.Device.StockQuantity > 0) 
+                    rental.Device.Status = DeviceStatus.Available;
                 
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
         }
 
-        // 6. Xử lý Tranh Chấp: Chủ máy chấp nhận lỗi -> Hủy đơn & Hoàn Cọc
+        // Xử lý Tranh Chấp: Chủ máy chấp nhận lỗi -> Hủy đơn & Hoàn Cọc
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResolveDisputeRefund(int id)
@@ -157,15 +158,17 @@ namespace TechShare.Controllers
                 rental.Status = RentalStatus.Cancelled; // Đơn bị hủy do lỗi
                 rental.DepositStatus = DepositStatus.Refunded; // Trả lại cọc cho sinh viên
                 
-                rental.Device.StockQuantity += rental.Quantity; // Cập nhật lại kho
-                if (rental.Device.StockQuantity > 0) rental.Device.Status = DeviceStatus.Available;
+                rental.Device.StockQuantity += rental.Quantity; 
+
+                if (rental.Device.StockQuantity > 0) 
+                    rental.Device.Status = DeviceStatus.Available;
                 
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
         }
 
-        // 7. Xử lý Tranh Chấp: Chủ máy xác định lỗi do khách làm hỏng -> Giữ cọc
+        // Xử lý Tranh Chấp: Chủ máy xác định lỗi do khách làm hỏng -> Giữ cọc
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResolveDisputeRetain(int id)

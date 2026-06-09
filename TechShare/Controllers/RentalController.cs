@@ -30,10 +30,9 @@ namespace TechShare.Controllers
             if (device == null) 
                 return NotFound();
 
-            // Tính số ngày và tổng tiền
             int rentDays = (endDate - startDate).Days;
             if (rentDays <= 0) 
-                rentDays = 1; // Ít nhất 1 ngày
+                rentDays = 1; 
 
             decimal totalPrice = rentDays * device.PricePerDay * quantity;
 
@@ -57,13 +56,14 @@ namespace TechShare.Controllers
                 return NotFound();
 
             int rentDays = (endDate - startDate).Days;
-            if (rentDays <= 0) rentDays = 1;
+            if (rentDays <= 0) 
+                rentDays = 1;
             decimal totalPrice = rentDays * device.PricePerDay * quantity;
 
             var rental = new Rental
             {
                 DeviceId = deviceId,
-                RenterId = userId, // Đã lấy từ ID thật đăng nhập
+                RenterId = userId, 
                 StartDate = startDate,
                 EndDate = endDate,
                 Quantity = quantity,
@@ -74,7 +74,6 @@ namespace TechShare.Controllers
                 Status = RentalStatus.Pending // Chờ chủ máy duyệt
             };
 
-            // Trừ số lượng tồn kho của thiết bị ngay lập tức để tránh người khác thuê mất
             device.StockQuantity -= quantity;
 
             _context.Rentals.Add(rental);

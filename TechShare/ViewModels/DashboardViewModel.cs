@@ -8,7 +8,7 @@ namespace TechShare.ViewModels
         // Danh sách đơn User ĐI THUÊ
         public List<Rental> MyRentals { get; set; } = new List<Rental>();
         
-        // Danh sách đơn User đem máy đi CHO THUÊ
+        // Danh sách đơn User CHO THUÊ
         public List<Rental> MyOrders { get; set; } = new List<Rental>();
     }
 }

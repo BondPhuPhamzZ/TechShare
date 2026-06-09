@@ -10,7 +10,7 @@ using TechShare.ViewModels;
 
 namespace TechShare.Controllers
 {
-    [Authorize] // Bắt buộc đăng nhập mới được vào trang này
+    [Authorize] 
     public class ProfileController : Controller
     {
         private readonly TechShareDbContext _context;
@@ -22,7 +22,6 @@ namespace TechShare.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Lấy ID người dùng đang đăng nhập từ Cookie
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
             {
@@ -30,18 +29,16 @@ namespace TechShare.Controllers
             }
 
             var viewModel = new ProfileViewModel();
-
-            // 1. Lấy thông tin cá nhân
             viewModel.UserInfo = await _context.Users.FindAsync(userId);
 
-            // 2. Lấy thiết bị đã đăng (Cửa hàng của tôi)
+            // Thiết bị đã đăng
             viewModel.MyPostedDevices = await _context.Devices
                 .Include(d => d.Category)
                 .Where(d => d.OwnerId == userId)
                 .OrderByDescending(d => d.Id)
                 .ToListAsync();
 
-            // 3. Lấy thiết bị ĐANG THUÊ (Để dễ quản lý tài sản đang cầm)
+            // Thiết bị đang thuê
             viewModel.MyActiveRentals = await _context.Rentals
                 .Include(r => r.Device)
                 .ThenInclude(d => d.Owner)
