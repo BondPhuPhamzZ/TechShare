@@ -56,7 +56,7 @@ namespace TechShare.Controllers
                 return RedirectToAction("VerifyIdentity", "Profile");
             }
 
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
@@ -111,7 +111,7 @@ namespace TechShare.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Đăng bài thành công!";
-                return RedirectToAction("Index", "Profile");
+                return RedirectToAction("Index", "Host");
             }
 
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
