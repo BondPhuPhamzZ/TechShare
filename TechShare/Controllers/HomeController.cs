@@ -17,7 +17,7 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string q)
+        public async Task<IActionResult> Index(string q, int? categoryId)
         {
             var query = _context.Devices
                 .Include(d => d.Owner)    
@@ -29,11 +29,18 @@ namespace TechShare.Controllers
                 query = query.Where(d => d.Name.Contains(q));
             }
 
+            if (categoryId.HasValue)
+            {
+                query = query.Where(d => d.CategoryId == categoryId.Value);
+            }
+
             var devices = await query
                 .OrderByDescending(d => d.Id) 
                 .ToListAsync();
 
             ViewData["SearchQuery"] = q;
+            ViewData["CategoryId"] = categoryId;
+            ViewData["Categories"] = await _context.Categories.ToListAsync();
 
             return View(devices);
         }

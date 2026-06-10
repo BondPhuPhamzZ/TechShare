@@ -13,6 +13,26 @@
         </p>
         <form asp-controller="Home" asp-action="Index" method="get" class="d-flex justify-content-center mt-4">
             <input type="text" name="q" value="@ViewData["SearchQuery"]" class="form-control w-50 me-2" placeholder="Tìm kiếm máy ảnh, laptop, cáp sạc..." />
+            
+            @{
+                var categories = ViewData["Categories"] as List<TechShare.Models.Category> ?? new List<TechShare.Models.Category>();
+                int? currentCatId = ViewData["CategoryId"] as int?;
+            }
+            <select name="categoryId" class="form-select w-25 me-2">
+                <option value="">Tất cả danh mục</option>
+                @foreach (var cat in categories)
+                {
+                    if (currentCatId == cat.Id)
+                    {
+                        <option value="@cat.Id" selected>@cat.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                }
+            </select>
+
             <button class="btn btn-primary btn-lg" type="submit">Tìm kiếm</button>
         </form>
     </div>
