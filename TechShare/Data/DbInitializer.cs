@@ -15,7 +15,7 @@ namespace TechShare.Data
 
             // === Users ===
             context.Users.AddRange(
-                new User{ Username="chu_may_vip", PasswordHash="123456", FullName="Phạm Gia Phú", PhoneNumber="0123456789", StudentId="SV001", ReputationScore = 5.0f },
+                new User{ Username="chu_may_vip@gmail.com", PasswordHash="123456", FullName="Phạm Gia Phú", PhoneNumber="0123456789", StudentId="SV001", ReputationScore = 5.0f },
                 new User{ Username="khach_thue", PasswordHash="123456", FullName="Dương Chí Kiệt", PhoneNumber="0987654321", StudentId="SV002", ReputationScore = 4.5f }
             );
             context.SaveChanges();
