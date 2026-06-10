@@ -8,7 +8,6 @@ namespace TechShare.Data
     {
         public static void Initialize(TechShareDbContext context)
         {
-            // Tự động tạo DB nếu chưa có
             context.Database.EnsureCreated();
 
             if (context.Categories.Any())
