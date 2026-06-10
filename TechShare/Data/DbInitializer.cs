@@ -17,8 +17,9 @@ namespace TechShare.Data
 
             // === Users ===
             context.Users.AddRange(
-                new User{ Username="chumayvip@gmail.com", PasswordHash="123456", FullName="Phạm Gia Phú", PhoneNumber="0123456789", StudentId="SV001", ReputationScore = 5.0f },
-                new User{ Username="khachthue", PasswordHash="123456", FullName="Dương Chí Kiệt", PhoneNumber="0987654321", StudentId="SV002", ReputationScore = 4.5f }
+                new User{ Username="chumayvip@gmail.com", Email="chumayvip@gmail.com", PasswordHash="123456", FullName="Phạm Gia Phú", PhoneNumber="0123456789", StudentId="SV001", ReputationScore = 5.0f, IsVerified = true, IdCardNumber = "012345678912" },
+                new User{ Username="khachthue", Email="khachthue@gmail.com", PasswordHash="123456", FullName="Dương Chí Kiệt", PhoneNumber="0987654321", StudentId="SV002", ReputationScore = 4.5f, IsVerified = true, IdCardNumber = "123456789012" },
+                new User{ Username="chuaxacthuc@gmail.com", Email="chuaxacthuc@gmail.com", PasswordHash="123456", FullName="Hồ Văn Quen", PhoneNumber="0111111111", StudentId="SV003", ReputationScore = 0.0f, IsVerified = false }
             );
             context.SaveChanges();
 
@@ -38,6 +39,7 @@ namespace TechShare.Data
                     PricePerDay = 250000, 
                     DepositAmount = 10000000, 
                     StockQuantity = 1, 
+                    Status = DeviceStatus.SanSang,
                     CategoryId = 1, 
                     OwnerId = 1,
                     ImageUrl = "https://cdn.tgdd.vn/Products/Images/44/231244/macbook-air-m1-2020-gray-600x600.jpg" 
@@ -48,6 +50,7 @@ namespace TechShare.Data
                     PricePerDay = 200000, 
                     DepositAmount = 5000000, 
                     StockQuantity = 1, 
+                    Status = DeviceStatus.SanSang,
                     CategoryId = 2, 
                     OwnerId = 1,
                     ImageUrl = "https://cdn.tgdd.vn/Products/Images/4728/222621/sony-alpha-a6400-body-1-600x600.jpg"
@@ -58,6 +61,7 @@ namespace TechShare.Data
                     PricePerDay = 20000, 
                     DepositAmount = 100000, 
                     StockQuantity = 5, 
+                    Status = DeviceStatus.SanSang,
                     CategoryId = 3, 
                     OwnerId = 1,
                     ImageUrl = "https://cdn.tgdd.vn/Products/Images/58/289564/cap-hdmi-2-0-day-du-3m-xmobile-ds261-2-600x600.jpg"

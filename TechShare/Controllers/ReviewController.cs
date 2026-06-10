@@ -29,7 +29,7 @@ namespace TechShare.Controllers
                 .ThenInclude(d => d.Owner)
                 .FirstOrDefaultAsync(r => r.Id == rentalId);
 
-            if (rental == null || rental.Status != RentalStatus.Completed) 
+            if (rental == null || rental.Status != RentalStatus.HoanTat)
                 return NotFound();
 
             bool hasReviewed = await _context.Reviews.AnyAsync(r => r.RentalId == rentalId);

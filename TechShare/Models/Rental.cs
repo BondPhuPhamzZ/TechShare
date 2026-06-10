@@ -17,17 +17,22 @@ namespace TechShare.Models
         
         public int Quantity { get; set; } = 1; 
         
-        public DeliveryMethod DeliveryMethod { get; set; }
-        
-        [MaxLength(500)]
-        public string? DeliveryAddress { get; set; } 
-        
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice { get; set; } 
         
-        public DepositStatus DepositStatus { get; set; } = DepositStatus.Pending;
+        public RentalStatus Status { get; set; } = RentalStatus.ChoDuyet;
+
+        // Trạng thái tiền cọc
+        public DepositStatus DepositStatus { get; set; } = DepositStatus.ChuaThanhToan;
+
+        // Phương thức giao hàng
+        public DeliveryMethod DeliveryMethod { get; set; } = DeliveryMethod.TuLay;
         
-        public RentalStatus Status { get; set; } = RentalStatus.Pending;
+        [MaxLength(500)]
+        public string? DeliveryAddress { get; set; } // Nếu GiaoTanNoi thì lưu địa chỉ khách
+
+        // Đánh giá
+        public bool IsReviewed { get; set; } = false;
 
         // Foreign Keys
         public int DeviceId { get; set; }

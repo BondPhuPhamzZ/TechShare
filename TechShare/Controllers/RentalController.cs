@@ -11,6 +11,8 @@ using System.Security.Claims;
 
 namespace TechShare.Controllers
 {
+    // Thuê thiết bị
+
     [Authorize]
     public class RentalController : Controller
     {
@@ -23,6 +25,13 @@ namespace TechShare.Controllers
 
         public async Task<IActionResult> Checkout(int deviceId, DateTime startDate, DateTime endDate, int quantity)
         {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null && !user.IsVerified)
+            {
+                return RedirectToAction("VerifyIdentity", "Profile");
+            }
+
             var device = await _context.Devices
                 .Include(d => d.Owner)
                 .FirstOrDefaultAsync(d => d.Id == deviceId);
@@ -50,7 +59,12 @@ namespace TechShare.Controllers
         public async Task<IActionResult> ConfirmCheckout(int deviceId, DateTime startDate, DateTime endDate, int quantity, string deliveryAddress, DeliveryMethod deliveryMethod)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null && !user.IsVerified)
+            {
+                return RedirectToAction("VerifyIdentity", "Profile");
+            }
+
             var device = await _context.Devices.FindAsync(deviceId);
             if (device == null) 
                 return NotFound();
@@ -70,8 +84,8 @@ namespace TechShare.Controllers
                 DeliveryMethod = deliveryMethod,
                 DeliveryAddress = deliveryAddress,
                 TotalPrice = totalPrice,
-                DepositStatus = DepositStatus.Paid, // Giả lập đã thanh toán cọc qua Momo/VNPay thành công
-                Status = RentalStatus.Pending // Chờ chủ máy duyệt
+                DepositStatus = DepositStatus.DaThanhToan, // Giả lập đã thanh toán cọc qua Momo/VNPay thành công
+                Status = RentalStatus.ChoDuyet // Chờ chủ máy duyệt
             };
 
             device.StockQuantity -= quantity;

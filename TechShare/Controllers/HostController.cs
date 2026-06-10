@@ -41,7 +41,7 @@ namespace TechShare.Controllers
             viewModel.MyOrders = await _context.Rentals
                 .Include(r => r.Device)
                 .Include(r => r.Renter)
-                .Where(r => r.Device.OwnerId == userId)
+                .Where(r => r.Device.OwnerId == userId && (r.Status == RentalStatus.ChoDuyet || r.Status == RentalStatus.ChoGiao || r.Status == RentalStatus.TranhChap || r.Status == RentalStatus.ChoTra || r.Status == RentalStatus.DangCheck))
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
 
@@ -58,14 +58,14 @@ namespace TechShare.Controllers
             
             if (device != null)
             {
-                if (device.Status == DeviceStatus.Available)
+                if (device.Status == DeviceStatus.SanSang)
                 {
-                    device.Status = DeviceStatus.OutOfStock;
+                    device.Status = DeviceStatus.HetHang;
                     device.StockQuantity = 0; // Ẩn khỏi trang chủ
                 }
                 else
                 {
-                    device.Status = DeviceStatus.Available;
+                    device.Status = DeviceStatus.SanSang;
                     device.StockQuantity = 1; // Hiện lại
                 }
                 await _context.SaveChangesAsync();
@@ -79,44 +79,50 @@ namespace TechShare.Controllers
         public async Task<IActionResult> ApproveOrder(int id)
         {
             var rental = await _context.Rentals.FindAsync(id);
-            if (rental != null && rental.Status == RentalStatus.Pending)
+            if (rental != null && rental.Status == RentalStatus.ChoDuyet)
             {
-                rental.Status = RentalStatus.Approved_PendingHandover;
+                rental.Status = RentalStatus.ChoGiao;
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
-        // Chủ máy -> mang máy đi giao
+        // Báo đã giao máy (Chờ khách check)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Handover(int id)
+        public async Task<IActionResult> MarkAsHandedOver(int id)
         {
             var rental = await _context.Rentals.FindAsync(id);
-            if (rental != null && rental.Status == RentalStatus.Approved_PendingHandover)
+            if (rental != null && rental.Status == RentalStatus.ChoGiao)
             {
-                rental.Status = RentalStatus.PendingRenterConfirmation; 
+                rental.Status = RentalStatus.DangCheck;
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         // Chủ máy xác nhận đã nhận lại máy và hoàn cọc
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CompleteOrder(int id)
+        public async Task<IActionResult> ConfirmReturn(int id)
         {
-            var rental = await _context.Rentals.Include(r => r.Device).FirstOrDefaultAsync(r => r.Id == id);
-            if (rental != null && rental.Status == RentalStatus.Returned_PendingInspection)
+            var rental = await _context.Rentals.FindAsync(id);
+            if (rental != null && rental.Status == RentalStatus.ChoTra)
             {
-                rental.Status = RentalStatus.Completed;
-                rental.DepositStatus = DepositStatus.Refunded;
+                rental.Status = RentalStatus.HoanTat;
+                rental.DepositStatus = DepositStatus.DaHoanTien; // Hoàn cọc
                 
-                rental.Device.StockQuantity += rental.Quantity;
+                // Tăng lại số lượng máy
+                var device = await _context.Devices.FindAsync(rental.DeviceId);
+                if (device != null)
+                {
+                    device.StockQuantity += rental.Quantity;
+                    if(device.StockQuantity > 0)
+                    {
+                        device.Status = DeviceStatus.SanSang;
+                    }
+                }
 
-                if (rental.Device.StockQuantity > 0) 
-                    rental.Device.Status = DeviceStatus.Available;
-                
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
@@ -128,15 +134,15 @@ namespace TechShare.Controllers
         public async Task<IActionResult> ResolveDisputeRefund(int id)
         {
             var rental = await _context.Rentals.Include(r => r.Device).FirstOrDefaultAsync(r => r.Id == id);
-            if (rental != null && rental.Status == RentalStatus.Disputed)
+            if (rental != null && rental.Status == RentalStatus.TranhChap)
             {
-                rental.Status = RentalStatus.Cancelled; 
-                rental.DepositStatus = DepositStatus.Refunded; 
+                rental.Status = RentalStatus.DaHuy; 
+                rental.DepositStatus = DepositStatus.DaHoanTien; // Hoàn cọc (Tranh chấp do lỗi hệ thống/chủ)
                 
-                rental.Device.StockQuantity += rental.Quantity; 
-
+                // Trả máy lại kho
+                rental.Device.StockQuantity += rental.Quantity;
                 if (rental.Device.StockQuantity > 0) 
-                    rental.Device.Status = DeviceStatus.Available;
+                    rental.Device.Status = DeviceStatus.SanSang;
                 
                 await _context.SaveChangesAsync();
             }
@@ -149,10 +155,12 @@ namespace TechShare.Controllers
         public async Task<IActionResult> ResolveDisputeRetain(int id)
         {
             var rental = await _context.Rentals.FirstOrDefaultAsync(r => r.Id == id);
-            if (rental != null && rental.Status == RentalStatus.Disputed)
+            if (rental != null && rental.Status == RentalStatus.TranhChap)
             {
-                rental.Status = RentalStatus.Completed; 
-                rental.DepositStatus = DepositStatus.Retained; 
+                rental.Status = RentalStatus.HoanTat; 
+                rental.DepositStatus = DepositStatus.GiuCoc; // Giữ cọc (Tranh chấp do lỗi khách)
+                
+                // Không cộng lại máy (máy đã hỏng/mất)
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");

@@ -2,7 +2,7 @@ namespace TechShare.Enums
 {
     public enum DeliveryMethod
     {
-        SelfPickup = 0,
-        Delivery = 1
+        TuLay = 0,
+        GiaoTanNoi = 1
     }
 }

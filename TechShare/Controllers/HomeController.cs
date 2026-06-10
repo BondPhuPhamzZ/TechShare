@@ -22,7 +22,7 @@ namespace TechShare.Controllers
             var query = _context.Devices
                 .Include(d => d.Owner)    
                 .Include(d => d.Category) 
-                .Where(d => d.Status == DeviceStatus.Available && d.StockQuantity > 0);
+                .Where(d => d.Status == DeviceStatus.SanSang && d.StockQuantity > 0);
 
             if (!string.IsNullOrEmpty(q))
             {

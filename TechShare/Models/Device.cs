@@ -25,7 +25,7 @@ namespace TechShare.Models
         
         public int StockQuantity { get; set; } = 1; 
         
-        public DeviceStatus Status { get; set; } = DeviceStatus.Available;
+        public DeviceStatus Status { get; set; } = DeviceStatus.SanSang;
 
         // Foreign Keys
         public int CategoryId { get; set; }

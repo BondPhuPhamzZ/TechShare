@@ -19,10 +19,10 @@ namespace TechShare.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // User - Device 
+            // Thiết lập quan hệ User (Owner) - Device (1-N)
             modelBuilder.Entity<Device>()
                 .HasOne(d => d.Owner)
-                .WithMany(u => u.OwnedDevices)
+                .WithMany(u => u.Devices)
                 .HasForeignKey(d => d.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 

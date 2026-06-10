@@ -9,8 +9,7 @@
     <ul class="nav nav-tabs mb-4" id="hostTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active fw-bold" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="true">
-                Đơn Khách Đặt Thuê
-                <span class="badge bg-danger ms-1">@Model.MyOrders.Count(x => x.Status == TechShare.Enums.RentalStatus.Pending)</span>
+                <span class="badge bg-danger ms-1">@Model.MyOrders.Count(x => x.Status == TechShare.Enums.RentalStatus.ChoDuyet)</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -57,28 +56,28 @@
                                             </td>
                                             <td><span class="badge @GetStatusBadgeClass(rental.Status)">@TranslateStatus(rental.Status)</span></td>
                                             <td class="text-end">
-                                                @if (rental.Status == TechShare.Enums.RentalStatus.Pending)
+                                                @if (rental.Status == TechShare.Enums.RentalStatus.ChoDuyet)
                                                 {
                                                     <form asp-action="ApproveOrder" method="post" class="d-inline">
                                                         <input type="hidden" name="id" value="@rental.Id" />
                                                         <button type="submit" class="btn btn-sm btn-success">Duyệt Đơn</button>
                                                     </form>
                                                 }
-                                                else if (rental.Status == TechShare.Enums.RentalStatus.Approved_PendingHandover)
+                                                else if (rental.Status == TechShare.Enums.RentalStatus.ChoGiao)
                                                 {
-                                                    <form asp-action="Handover" method="post" class="d-inline">
+                                                    <form asp-action="MarkAsHandedOver" method="post" class="d-inline">
                                                         <input type="hidden" name="id" value="@rental.Id" />
-                                                        <button type="submit" class="btn btn-sm btn-primary">Giao Máy Cho Khách</button>
+                                                        <button type="submit" class="btn btn-sm btn-primary">Giao máy cho khách</button>
                                                     </form>
                                                 }
-                                                else if (rental.Status == TechShare.Enums.RentalStatus.Returned_PendingInspection)
+                                                else if (rental.Status == TechShare.Enums.RentalStatus.ChoTra)
                                                 {
-                                                    <form asp-action="CompleteOrder" method="post" class="d-inline">
+                                                    <form asp-action="ConfirmReturn" method="post" class="d-inline">
                                                         <input type="hidden" name="id" value="@rental.Id" />
-                                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Máy còn nguyên vẹn? Bấm OK để hoàn cọc và Đóng đơn.')">Đã Nhận Lại Máy</button>
+                                                        <button type="submit" class="btn btn-sm btn-success">Đã nhận lại máy & Hoàn Cọc</button>
                                                     </form>
                                                 }
-                                                else if (rental.Status == TechShare.Enums.RentalStatus.Disputed)
+                                                else if (rental.Status == TechShare.Enums.RentalStatus.TranhChap)
                                                 {
                                                     <div class="alert alert-danger p-2 mb-0 text-start small">
                                                         <strong>Khách báo lỗi!</strong><br />
@@ -121,12 +120,12 @@
                                 <div class="card-body">
                                     <h6 class="fw-bold">@device.Name</h6>
                                     <p class="text-danger small fw-bold">@device.PricePerDay.ToString("N0") đ/ngày</p>
-                                    <span class="badge @(device.Status == TechShare.Enums.DeviceStatus.Available ? "bg-success" : "bg-secondary")">@device.Status</span>
+                                    <span class="badge @(device.Status == TechShare.Enums.DeviceStatus.SanSang ? "bg-success" : "bg-secondary")">@device.Status</span>
                                 </div>
                                 <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
                                     <form asp-action="ToggleDeviceStatus" method="post">
                                         <input type="hidden" name="deviceId" value="@device.Id" />
-                                        @if (device.Status == TechShare.Enums.DeviceStatus.Available)
+                                        @if (device.Status == TechShare.Enums.DeviceStatus.SanSang)
                                         {
                                             <button type="submit" class="btn btn-outline-danger btn-sm">Tạm Ẩn</button>
                                         }
@@ -151,15 +150,15 @@
     {
         return status switch
         {
-            TechShare.Enums.RentalStatus.Pending => "Chờ duyệt",
-            TechShare.Enums.RentalStatus.Approved_PendingHandover => "Chờ Giao Máy",
-            TechShare.Enums.RentalStatus.PendingRenterConfirmation => "Khách đang check",
-            TechShare.Enums.RentalStatus.Active => "Đang Thuê",
-            TechShare.Enums.RentalStatus.Returned_PendingInspection => "Chờ kiểm tra trả",
-            TechShare.Enums.RentalStatus.Completed => "Hoàn Tất",
-            TechShare.Enums.RentalStatus.Cancelled => "Đã Hủy",
-            TechShare.Enums.RentalStatus.Disputed => "Đang Tranh Chấp",
-            _ => status.ToString()
+            TechShare.Enums.RentalStatus.ChoDuyet => "Chờ duyệt",
+            TechShare.Enums.RentalStatus.ChoGiao => "Chờ Giao Máy",
+            TechShare.Enums.RentalStatus.DangCheck => "Khách đang check",
+            TechShare.Enums.RentalStatus.DangThue => "Đang Thuê",
+            TechShare.Enums.RentalStatus.ChoTra => "Chờ kiểm tra trả",
+            TechShare.Enums.RentalStatus.HoanTat => "Hoàn Tất",
+            TechShare.Enums.RentalStatus.DaHuy => "Đã Hủy",
+            TechShare.Enums.RentalStatus.TranhChap => "Đang Tranh Chấp",
+            _ => "Không xác định"
         };
     }
 
@@ -167,11 +166,11 @@
     {
         return status switch
         {
-            TechShare.Enums.RentalStatus.Pending => "bg-warning text-dark",
-            TechShare.Enums.RentalStatus.Approved_PendingHandover => "bg-info text-dark",
-            TechShare.Enums.RentalStatus.Active => "bg-primary",
-            TechShare.Enums.RentalStatus.Completed => "bg-success",
-            TechShare.Enums.RentalStatus.Disputed => "bg-danger",
+            TechShare.Enums.RentalStatus.ChoDuyet => "bg-warning text-dark",
+            TechShare.Enums.RentalStatus.ChoGiao => "bg-info text-dark",
+            TechShare.Enums.RentalStatus.DangThue => "bg-primary",
+            TechShare.Enums.RentalStatus.HoanTat => "bg-success",
+            TechShare.Enums.RentalStatus.TranhChap => "bg-danger",
             _ => "bg-secondary"
         };
     }

@@ -46,10 +46,17 @@ namespace TechShare.Controllers
 
         // Trang upload thiết bị
         [Authorize]
-        [HttpGet]
-        public IActionResult Create()
+        // GET: Device/Create
+        public async Task<IActionResult> Create()
         {
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null && !user.IsVerified)
+            {
+                return RedirectToAction("VerifyIdentity", "Profile");
+            }
+
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 

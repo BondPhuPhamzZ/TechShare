@@ -32,8 +32,15 @@ namespace TechShare.Models
         
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation properties
-        public ICollection<Device> OwnedDevices { get; set; } = new List<Device>();
+        public string Role { get; set; } = "User"; // User / Admin
+
+        // Thông tin xác thực (KYC)
+        public bool IsVerified { get; set; } = false;
+        
+        [RegularExpression(@"^\d{12}$", ErrorMessage = "CCCD phải gồm đúng 12 chữ số")]
+        public string? IdCardNumber { get; set; }
+
+        public ICollection<Device> Devices { get; set; } = new List<Device>();
         public ICollection<Rental> Rentals { get; set; } = new List<Rental>();
     }
 }

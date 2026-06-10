@@ -2,8 +2,8 @@ namespace TechShare.Enums
 {
     public enum DeviceStatus
     {
-        Available = 0,
-        OutOfStock = 1,
-        Maintenance = 2
+        SanSang = 0,
+        HetHang = 1,
+        BaoTri = 2
     }
 }
