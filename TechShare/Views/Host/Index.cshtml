@@ -51,7 +51,7 @@
                                                 <small class="text-muted">@rental.StartDate.ToString("dd/MM") - @rental.EndDate.ToString("dd/MM")</small>
                                             </td>
                                             <td>
-                                                <div>@rental.Renter.FullName</div>
+                                                <div><a asp-controller="Profile" asp-action="Detail" asp-route-id="@rental.RenterId" class="text-decoration-none fw-bold text-dark">@rental.Renter.FullName</a></div>
                                                 <small class="text-muted">Uy tín: ⭐@rental.Renter.ReputationScore.ToString("0.0")/5</small>
                                             </td>
                                             <td><span class="badge @GetStatusBadgeClass(rental.Status)">@TranslateStatus(rental.Status)</span></td>

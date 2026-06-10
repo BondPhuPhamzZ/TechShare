@@ -35,7 +35,7 @@ namespace TechShare.Controllers
             bool hasReviewed = await _context.Reviews.AnyAsync(r => r.RentalId == rentalId);
             if (hasReviewed)
             {
-                return RedirectToAction("Index", "Dashboard");
+                return RedirectToAction("Index", "RentalHistory");
             }
 
             return View(rental);
@@ -78,7 +78,7 @@ namespace TechShare.Controllers
             rental.Device.Owner.ReputationScore = average;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", "Dashboard");
+            return RedirectToAction("Index", "RentalHistory");
         }
     }
 }
