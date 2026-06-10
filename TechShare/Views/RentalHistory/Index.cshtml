@@ -1,4 +1,4 @@
-@model IEnumerable<TechShare.Models.Rental>
+@model TechShare.ViewModels.RentalHistoryViewModel
 @{
     ViewData["Title"] = "Đơn đi thuê của tôi";
 }
@@ -8,77 +8,40 @@
         <h2 class="fw-bold"><i class="bi bi-bag-check"></i> Đơn Đi Thuê (Lịch sử thuê máy)</h2>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Mã Đơn</th>
-                            <th>Thiết bị</th>
-                            <th>Chủ máy</th>
-                            <th>Ngày mượn - Ngày trả</th>
-                            <th>Trạng thái</th>
-                            <th class="text-end">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Any())
-                        {
-                            <tr><td colspan="6" class="text-center py-4 text-muted">Bạn chưa thuê thiết bị nào.</td></tr>
-                        }
-                        else
-                        {
-                            @foreach (var rental in Model)
-                            {
-                                <tr>
-                                    <td><span class="badge bg-secondary">#@rental.Id</span></td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="@rental.Device.ImageUrl" style="width: 50px; height: 50px; object-fit: cover;" class="rounded me-3" />
-                                            <div>
-                                                <a asp-controller="Device" asp-action="Detail" asp-route-id="@rental.Device.Id" class="fw-bold text-decoration-none">@rental.Device.Name</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>@rental.Device.Owner.FullName</td>
-                                    <td>
-                                        <div>@rental.StartDate.ToString("dd/MM/yyyy")</div>
-                                        <div class="text-danger fw-bold">@rental.EndDate.ToString("dd/MM/yyyy")</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge @GetStatusBadgeClass(rental.Status)">@TranslateStatus(rental.Status)</span>
-                                    </td>
-                                    <td class="text-end">
-                                        @if (rental.Status == TechShare.Enums.RentalStatus.DangCheck)
-                                        {
-                                            <form asp-action="ConfirmHandover" method="post" class="d-inline">
-                                                <input type="hidden" name="id" value="@rental.Id" />
-                                                <button type="submit" class="btn btn-sm btn-primary">Đã nhận máy (Bắt đầu 2H test)</button>
-                                            </form>
-                                        }
-                                        else if (rental.Status == TechShare.Enums.RentalStatus.DangThue)
-                                        {
-                                            <form asp-action="ReportIssue" method="post" class="d-inline">
-                                                <input type="hidden" name="id" value="@rental.Id" />
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn phát hiện máy có lỗi? Đơn sẽ bị tạm khóa để phân xử.')">Báo Lỗi</button>
-                                            </form>
-                                            <form asp-action="ReturnDevice" method="post" class="d-inline ms-1">
-                                                <input type="hidden" name="id" value="@rental.Id" />
-                                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Xác nhận trả máy lại cho Chủ?')">Trả Máy</button>
-                                            </form>
-                                        }
-                                        else if (rental.Status == TechShare.Enums.RentalStatus.HoanTat)
-                                        {
-                                            <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-sm btn-outline-warning">Đánh giá Chủ Máy</a>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs mb-4" id="rentalTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab" aria-selected="true">
+                Đang Thuê <span class="badge bg-primary ms-1">@Model.ActiveRentals.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-selected="false">
+                Chờ Duyệt <span class="badge bg-warning text-dark ms-1">@Model.PendingRentals.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" aria-selected="false">
+                Lịch Sử Cũ <span class="badge bg-secondary ms-1">@Model.CompletedRentals.Count</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content" id="rentalTabsContent">
+        <!-- Đang Thuê -->
+        <div class="tab-pane fade show active" id="active" role="tabpanel" aria-labelledby="active-tab">
+            @await Html.PartialAsync("_RentalTablePartial", Model.ActiveRentals)
+        </div>
+        
+        <!-- Chờ Duyệt -->
+        <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+            @await Html.PartialAsync("_RentalTablePartial", Model.PendingRentals)
+        </div>
+
+        <!-- Lịch Sử Cũ -->
+        <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+            @await Html.PartialAsync("_RentalTablePartial", Model.CompletedRentals)
         </div>
     </div>
 </div>
