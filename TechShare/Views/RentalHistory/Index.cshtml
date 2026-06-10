@@ -1,0 +1,115 @@
+@model IEnumerable<TechShare.Models.Rental>
+@{
+    ViewData["Title"] = "Đơn đi thuê của tôi";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="bi bi-bag-check"></i> Đơn Đi Thuê (Lịch sử thuê máy)</h2>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã Đơn</th>
+                            <th>Thiết bị</th>
+                            <th>Chủ máy</th>
+                            <th>Ngày mượn - Ngày trả</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr><td colspan="6" class="text-center py-4 text-muted">Bạn chưa thuê thiết bị nào.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var rental in Model)
+                            {
+                                <tr>
+                                    <td><span class="badge bg-secondary">#@rental.Id</span></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@rental.Device.ImageUrl" style="width: 50px; height: 50px; object-fit: cover;" class="rounded me-3" />
+                                            <div>
+                                                <a asp-controller="Device" asp-action="Detail" asp-route-id="@rental.Device.Id" class="fw-bold text-decoration-none">@rental.Device.Name</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@rental.Device.Owner.FullName</td>
+                                    <td>
+                                        <div>@rental.StartDate.ToString("dd/MM/yyyy")</div>
+                                        <div class="text-danger fw-bold">@rental.EndDate.ToString("dd/MM/yyyy")</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(rental.Status)">@TranslateStatus(rental.Status)</span>
+                                    </td>
+                                    <td class="text-end">
+                                        @if (rental.Status == TechShare.Enums.RentalStatus.Approved_PendingHandover)
+                                        {
+                                            <form asp-action="ConfirmHandover" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@rental.Id" />
+                                                <button type="submit" class="btn btn-sm btn-success fw-bold" onclick="return confirm('Bạn xác nhận đã nhận máy và kiểm tra kỹ tình trạng?')">Đã nhận máy (Bắt đầu 2H test)</button>
+                                            </form>
+                                        }
+                                        else if (rental.Status == TechShare.Enums.RentalStatus.Active)
+                                        {
+                                            <form asp-action="ReportIssue" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@rental.Id" />
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn phát hiện máy có lỗi? Đơn sẽ bị tạm khóa để phân xử.')">Báo Lỗi</button>
+                                            </form>
+                                            <form asp-action="ReturnDevice" method="post" class="d-inline ms-1">
+                                                <input type="hidden" name="id" value="@rental.Id" />
+                                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Xác nhận trả máy lại cho Chủ?')">Trả Máy</button>
+                                            </form>
+                                        }
+                                        else if (rental.Status == TechShare.Enums.RentalStatus.Completed)
+                                        {
+                                            <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-sm btn-outline-warning fw-bold">⭐ Đánh giá Chủ máy</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string TranslateStatus(TechShare.Enums.RentalStatus status)
+    {
+        return status switch
+        {
+            TechShare.Enums.RentalStatus.Pending => "Chờ duyệt",
+            TechShare.Enums.RentalStatus.Approved_PendingHandover => "Chờ Giao Máy",
+            TechShare.Enums.RentalStatus.PendingRenterConfirmation => "Khách đang check",
+            TechShare.Enums.RentalStatus.Active => "Đang Thuê",
+            TechShare.Enums.RentalStatus.Returned_PendingInspection => "Chờ kiểm tra trả",
+            TechShare.Enums.RentalStatus.Completed => "Hoàn Tất",
+            TechShare.Enums.RentalStatus.Cancelled => "Đã Hủy",
+            TechShare.Enums.RentalStatus.Disputed => "Đang Tranh Chấp",
+            _ => status.ToString()
+        };
+    }
+
+    public string GetStatusBadgeClass(TechShare.Enums.RentalStatus status)
+    {
+        return status switch
+        {
+            TechShare.Enums.RentalStatus.Pending => "bg-warning text-dark",
+            TechShare.Enums.RentalStatus.Approved_PendingHandover => "bg-info text-dark",
+            TechShare.Enums.RentalStatus.Active => "bg-primary",
+            TechShare.Enums.RentalStatus.Completed => "bg-success",
+            TechShare.Enums.RentalStatus.Disputed => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

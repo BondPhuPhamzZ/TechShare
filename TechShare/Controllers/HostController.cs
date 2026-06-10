@@ -1,45 +1,43 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TechShare.Data;
 using TechShare.Enums;
 using TechShare.ViewModels;
 
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-
 namespace TechShare.Controllers
 {
-    [Authorize] 
-    public class DashboardController : Controller
+    [Authorize]
+    public class HostController : Controller
     {
         private readonly TechShareDbContext _context;
 
-        public DashboardController(TechShareDbContext context)
+        public HostController(TechShareDbContext context)
         {
             _context = context;
         }
 
-        // Luồng xử lý Dashboard giữa ng thuê và ng cho thuê
+        // KÊNH CHỦ MÁY: Quản lý thiết bị đã đăng & Đơn khách đặt thuê
         public async Task<IActionResult> Index()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) 
                 return RedirectToAction("Login", "Auth");
 
-            var viewModel = new DashboardViewModel();
+            var viewModel = new HostViewModel();
 
-            // Đơn đi thuê
-            viewModel.MyRentals = await _context.Rentals
-                .Include(r => r.Device)
-                .ThenInclude(d => d.Owner)
-                .Where(r => r.RenterId == userId)
-                .OrderByDescending(r => r.Id)
+            // 1. Kho máy của tôi
+            viewModel.MyPostedDevices = await _context.Devices
+                .Include(d => d.Category)
+                .Where(d => d.OwnerId == userId)
+                .OrderByDescending(d => d.Id)
                 .ToListAsync();
 
-            // Đơn cho thuê
+            // 2. Đơn khách đang thuê máy của mình
             viewModel.MyOrders = await _context.Rentals
                 .Include(r => r.Device)
                 .Include(r => r.Renter)
@@ -48,6 +46,31 @@ namespace TechShare.Controllers
                 .ToListAsync();
 
             return View(viewModel);
+        }
+
+        // Bật / Tắt trạng thái cho thuê của máy
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleDeviceStatus(int deviceId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var device = await _context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId && d.OwnerId == userId);
+            
+            if (device != null)
+            {
+                if (device.Status == DeviceStatus.Available)
+                {
+                    device.Status = DeviceStatus.OutOfStock;
+                    device.StockQuantity = 0; // Ẩn khỏi trang chủ
+                }
+                else
+                {
+                    device.Status = DeviceStatus.Available;
+                    device.StockQuantity = 1; // Hiện lại
+                }
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
         }
 
         // Chủ máy duyệt đơn
@@ -72,55 +95,7 @@ namespace TechShare.Controllers
             var rental = await _context.Rentals.FindAsync(id);
             if (rental != null && rental.Status == RentalStatus.Approved_PendingHandover)
             {
-                // chờ khách xác nhận
                 rental.Status = RentalStatus.PendingRenterConfirmation; 
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction("Index");
-        }
-
-        // Khách đã test xong và xác nhận -> Bắt đầu tính 2h
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmHandover(int id)
-        {
-            var rental = await _context.Rentals.FindAsync(id);
-            if (rental != null && rental.Status == RentalStatus.PendingRenterConfirmation)
-            {
-                rental.Status = RentalStatus.Active;
-                rental.ActualHandoverTime = DateTime.Now; 
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction("Index");
-        }
-
-        // Khách thuê báo lỗi (chỉ dc phép trong 2h đầu)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReportIssue(int id)
-        {
-            var rental = await _context.Rentals.FindAsync(id);
-            if (rental != null && rental.Status == RentalStatus.Active && rental.ActualHandoverTime.HasValue)
-            {
-                var timePassed = DateTime.Now - rental.ActualHandoverTime.Value;
-                if (timePassed.TotalHours <= 2)
-                {
-                    rental.Status = RentalStatus.Disputed;
-                    await _context.SaveChangesAsync();
-                }
-            }
-            return RedirectToAction("Index");
-        }
-
-        // Khách thuê trả máy
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReturnDevice(int id)
-        {
-            var rental = await _context.Rentals.FindAsync(id);
-            if (rental != null && rental.Status == RentalStatus.Active)
-            {
-                rental.Status = RentalStatus.Returned_PendingInspection;
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");

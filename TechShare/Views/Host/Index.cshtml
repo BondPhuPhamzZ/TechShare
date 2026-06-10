@@ -1,0 +1,178 @@
+@model TechShare.ViewModels.HostViewModel
+@{
+    ViewData["Title"] = "Kênh Chủ Máy";
+}
+
+<div class="container mt-5">
+    <h2 class="fw-bold mb-4">Kênh Chủ Máy (Quản lý cho thuê)</h2>
+
+    <ul class="nav nav-tabs mb-4" id="hostTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="true">
+                Đơn Khách Đặt Thuê
+                <span class="badge bg-danger ms-1">@Model.MyOrders.Count(x => x.Status == TechShare.Enums.RentalStatus.Pending)</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory" type="button" role="tab" aria-controls="inventory" aria-selected="false">
+                Kho Máy Của Tôi
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="hostTabsContent">
+        <!-- TAB 1: ĐƠN KHÁCH ĐẶT -->
+        <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Mã Đơn</th>
+                                    <th>Thiết bị</th>
+                                    <th>Người thuê (Khách)</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-end">Xử lý</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!Model.MyOrders.Any())
+                                {
+                                    <tr><td colspan="5" class="text-center py-4 text-muted">Chưa có ai đặt thuê máy của bạn.</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var rental in Model.MyOrders)
+                                    {
+                                        <tr>
+                                            <td><span class="badge bg-secondary">#@rental.Id</span></td>
+                                            <td>
+                                                <div class="fw-bold">@rental.Device.Name</div>
+                                                <small class="text-muted">@rental.StartDate.ToString("dd/MM") - @rental.EndDate.ToString("dd/MM")</small>
+                                            </td>
+                                            <td>
+                                                <div>@rental.Renter.FullName</div>
+                                                <small class="text-muted">Uy tín: ⭐@rental.Renter.ReputationScore.ToString("0.0")/5</small>
+                                            </td>
+                                            <td><span class="badge @GetStatusBadgeClass(rental.Status)">@TranslateStatus(rental.Status)</span></td>
+                                            <td class="text-end">
+                                                @if (rental.Status == TechShare.Enums.RentalStatus.Pending)
+                                                {
+                                                    <form asp-action="ApproveOrder" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@rental.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-success">Duyệt Đơn</button>
+                                                    </form>
+                                                }
+                                                else if (rental.Status == TechShare.Enums.RentalStatus.Approved_PendingHandover)
+                                                {
+                                                    <form asp-action="Handover" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@rental.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-primary">Giao Máy Cho Khách</button>
+                                                    </form>
+                                                }
+                                                else if (rental.Status == TechShare.Enums.RentalStatus.Returned_PendingInspection)
+                                                {
+                                                    <form asp-action="CompleteOrder" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@rental.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Máy còn nguyên vẹn? Bấm OK để hoàn cọc và Đóng đơn.')">Đã Nhận Lại Máy</button>
+                                                    </form>
+                                                }
+                                                else if (rental.Status == TechShare.Enums.RentalStatus.Disputed)
+                                                {
+                                                    <div class="alert alert-danger p-2 mb-0 text-start small">
+                                                        <strong>Khách báo lỗi!</strong><br />
+                                                        Vui lòng kiểm tra lại thiết bị.<br/>
+                                                        <form asp-action="ResolveDisputeRefund" method="post" class="d-inline">
+                                                            <input type="hidden" name="id" value="@rental.Id" />
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger mt-1">Lỗi do mình (Hủy đơn/Hoàn cọc)</button>
+                                                        </form>
+                                                        <form asp-action="ResolveDisputeRetain" method="post" class="d-inline">
+                                                            <input type="hidden" name="id" value="@rental.Id" />
+                                                            <button type="submit" class="btn btn-sm btn-dark mt-1">Lỗi do khách (Phạt Cọc)</button>
+                                                        </form>
+                                                    </div>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: KHO MÁY -->
+        <div class="tab-pane fade" id="inventory" role="tabpanel" aria-labelledby="inventory-tab">
+            <div class="row row-cols-1 row-cols-md-4 g-4 mt-2">
+                @if (!Model.MyPostedDevices.Any())
+                {
+                    <div class="col-12"><div class="alert alert-info">Kho máy trống. Hãy đăng bài cho thuê!</div></div>
+                }
+                else
+                {
+                    @foreach (var device in Model.MyPostedDevices)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <img src="@device.ImageUrl" class="card-img-top" style="height: 180px; object-fit: cover;" />
+                                <div class="card-body">
+                                    <h6 class="fw-bold">@device.Name</h6>
+                                    <p class="text-danger small fw-bold">@device.PricePerDay.ToString("N0") đ/ngày</p>
+                                    <span class="badge @(device.Status == TechShare.Enums.DeviceStatus.Available ? "bg-success" : "bg-secondary")">@device.Status</span>
+                                </div>
+                                <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                                    <form asp-action="ToggleDeviceStatus" method="post">
+                                        <input type="hidden" name="deviceId" value="@device.Id" />
+                                        @if (device.Status == TechShare.Enums.DeviceStatus.Available)
+                                        {
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Tạm Ẩn</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-success btn-sm">Hiện Lại</button>
+                                        }
+                                    </form>
+                                    <a asp-controller="Device" asp-action="Detail" asp-route-id="@device.Id" class="btn btn-outline-primary btn-sm">Xem</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string TranslateStatus(TechShare.Enums.RentalStatus status)
+    {
+        return status switch
+        {
+            TechShare.Enums.RentalStatus.Pending => "Chờ duyệt",
+            TechShare.Enums.RentalStatus.Approved_PendingHandover => "Chờ Giao Máy",
+            TechShare.Enums.RentalStatus.PendingRenterConfirmation => "Khách đang check",
+            TechShare.Enums.RentalStatus.Active => "Đang Thuê",
+            TechShare.Enums.RentalStatus.Returned_PendingInspection => "Chờ kiểm tra trả",
+            TechShare.Enums.RentalStatus.Completed => "Hoàn Tất",
+            TechShare.Enums.RentalStatus.Cancelled => "Đã Hủy",
+            TechShare.Enums.RentalStatus.Disputed => "Đang Tranh Chấp",
+            _ => status.ToString()
+        };
+    }
+
+    public string GetStatusBadgeClass(TechShare.Enums.RentalStatus status)
+    {
+        return status switch
+        {
+            TechShare.Enums.RentalStatus.Pending => "bg-warning text-dark",
+            TechShare.Enums.RentalStatus.Approved_PendingHandover => "bg-info text-dark",
+            TechShare.Enums.RentalStatus.Active => "bg-primary",
+            TechShare.Enums.RentalStatus.Completed => "bg-success",
+            TechShare.Enums.RentalStatus.Disputed => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
