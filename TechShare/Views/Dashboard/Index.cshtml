@@ -116,7 +116,7 @@
                                     }
                                     else if (rental.Status == RentalStatus.Completed)
                                     {
-                                        <a href="/Review/Create?rentalId=@rental.Id" class="btn btn-warning fw-bold shadow-sm">⭐ Đánh giá Chủ máy</a>
+                                        <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-warning fw-bold shadow-sm">⭐ Đánh giá Chủ máy</a>
                                     }
                                     else if (rental.Status == RentalStatus.Pending || rental.Status == RentalStatus.Approved_PendingHandover)
                                     {

@@ -80,7 +80,7 @@
                                                 <button type="submit" class="btn btn-success btn-sm">Hiện Lại (Cho thuê)</button>
                                             }
                                         </form>
-                                        <a href="/Device/Detail/@device.Id" class="btn btn-outline-primary btn-sm ms-1">Xem</a>
+                                        <a asp-controller="Device" asp-action="Detail" asp-route-id="@device.Id" class="btn btn-outline-primary btn-sm ms-1">Xem</a>
                                     </div>
                                 </div>
                             }
@@ -122,7 +122,7 @@
                                             <td>@rental.Device.Owner.FullName</td>
                                             <td class="text-danger fw-bold">@rental.EndDate.ToString("dd/MM")</td>
                                             <td><span class="badge bg-info text-dark">@TranslateStatus(rental.Status)</span></td>
-                                            <td><a href="/Dashboard" class="btn btn-sm btn-primary">Xử lý ngay</a></td>
+                                            <td><a asp-controller="Dashboard" asp-action="Index" class="btn btn-sm btn-primary">Xử lý ngay</a></td>
                                         </tr>
                                     }
                                 </tbody>

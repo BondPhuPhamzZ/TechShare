@@ -1,0 +1,32 @@
+@model TechShare.Models.Device
+
+<div class="col">
+    <div class="card h-100 shadow-sm border-0 bg-white">
+        <!-- Ảnh thiết bị -->
+        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="height: 250px; object-fit: cover;">
+        
+        <div class="card-body">
+            <span class="badge bg-secondary mb-2">@Model.Category.Name</span>
+            <h5 class="card-title fw-bold text-truncate" title="@Model.Name">@Model.Name</h5>
+            
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <span class="text-danger fw-bold fs-5">@Model.PricePerDay.ToString("N0") VNĐ/Ngày</span>
+            </div>
+            
+            <div class="mt-2 text-muted small">
+                <span>Kho còn: <strong class="text-success">@Model.StockQuantity</strong> cái</span>
+            </div>
+        </div>
+        
+        <div class="card-footer bg-white border-top-0 pt-0">
+            <hr />
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="small">
+                    Chủ máy: <strong>@Model.Owner.FullName</strong><br/>
+                    Uy tín: <span class="text-warning">⭐ @Model.Owner.ReputationScore.ToString("0.0")/5</span>
+                </div>
+                <a asp-controller="Device" asp-action="Detail" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm px-3">Xem chi tiết</a>
+            </div>
+        </div>
+    </div>
+</div>

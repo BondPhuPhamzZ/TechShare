@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using TechShare.ViewModels;
 using System.Security.Claims;
 using TechShare.Models;
+using Microsoft.AspNetCore.Hosting;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace TechShare.Controllers
 {
@@ -48,24 +52,33 @@ namespace TechShare.Controllers
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
+
         // Xử lý đăng thiết bị cho thuê lên
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DeviceCreateViewModel model)
         {
-            
             if (ModelState.IsValid)
             {
                 string uniqueFileName = "";
 
-                // Lưu file ảnh
                 if (model.ImageFile != null)
                 {
+                    // Kiểm tra định dạng đuôi file ảnh
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var extension = Path.GetExtension(model.ImageFile.FileName).ToLower();
+
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError("ImageFile", "Chỉ hỗ trợ file ảnh (.jpg, .jpeg, .png, .gif)");
+                        ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+                        TempData["ErrorMessage"] = "Đăng bài thất bại: Sai định dạng ảnh!";
+                        return View(model);
+                    }
+
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
-
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
-
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -83,7 +96,7 @@ namespace TechShare.Controllers
                     PricePerDay = model.PricePerDay,
                     DepositAmount = model.DepositAmount,
                     StockQuantity = model.StockQuantity,
-                    ImageUrl = "/images" + uniqueFileName,
+                    ImageUrl = "/images/" + uniqueFileName,
                     OwnerId = int.Parse(userIdStr)
                 };
 
@@ -96,8 +109,6 @@ namespace TechShare.Controllers
 
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             return View(model);
-
         }
-
     }
 }

@@ -14,37 +14,22 @@ namespace TechShare.Data
             }
 
             // === Users ===
-            var users = new User[]
-            {
+            context.Users.AddRange(
                 new User{ Username="chu_may_vip", PasswordHash="123456", FullName="Phạm Gia Phú", PhoneNumber="0123456789", StudentId="SV001", ReputationScore = 5.0f },
                 new User{ Username="khach_thue", PasswordHash="123456", FullName="Dương Chí Kiệt", PhoneNumber="0987654321", StudentId="SV002", ReputationScore = 4.5f }
-            };
-
-            foreach (User u in users) 
-            { 
-                context.Users.Add(u); 
-            }
-
+            );
             context.SaveChanges();
 
             // === Categories ===
-            var categories = new Category[]
-            {
+            context.Categories.AddRange(
                 new Category{ Name="Laptop & PC" },
                 new Category{ Name="Máy ảnh & Quay phim" },
                 new Category{ Name="Phụ kiện (Âm thanh/Ánh sáng)" }
-            };
-
-            foreach (Category c in categories) 
-            { 
-                context.Categories.Add(c); 
-            }
-
+            );
             context.SaveChanges();
 
             // === Devices ===
-            var devices = new Device[]
-            {
+            context.Devices.AddRange(
                 new Device{ 
                     Name="Macbook Pro M1 2020", 
                     Description="Máy nguyên bản, pin trâu, cực kỳ mượt mà để code đồ án Web.", 
@@ -75,13 +60,7 @@ namespace TechShare.Data
                     OwnerId = 1,
                     ImageUrl = "https://cdn.tgdd.vn/Products/Images/58/289564/cap-hdmi-2-0-day-du-3m-xmobile-ds261-2-600x600.jpg"
                 }
-            };
-
-            foreach (Device d in devices) 
-            { 
-                context.Devices.Add(d); 
-            }
-
+            );
             context.SaveChanges();
         }
     }
