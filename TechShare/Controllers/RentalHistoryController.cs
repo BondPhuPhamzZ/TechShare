@@ -20,7 +20,7 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        // Lịch sử / Tiến độ các thiết bị mình ĐANG ĐI THUÊ
+        // Lịch sử / Tiến độ các thiết bị mình đang thuê
         public async Task<IActionResult> Index()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -34,7 +34,7 @@ namespace TechShare.Controllers
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
 
-            return View(myRentals); // Truyền thẳng List thay vì ViewModel
+            return View(myRentals); 
         }
 
         // Khách đã test xong và xác nhận -> Bắt đầu tính 2h

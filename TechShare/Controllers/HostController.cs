@@ -21,7 +21,7 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        // KÊNH CHỦ MÁY: Quản lý thiết bị đã đăng & Đơn khách đặt thuê
+        // Chủ máy -> Quản lý thiết bị đã đăng & Đơn khách đặt thuê
         public async Task<IActionResult> Index()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -30,14 +30,14 @@ namespace TechShare.Controllers
 
             var viewModel = new HostViewModel();
 
-            // 1. Kho máy của tôi
+            // Kho máy của tôi
             viewModel.MyPostedDevices = await _context.Devices
                 .Include(d => d.Category)
                 .Where(d => d.OwnerId == userId)
                 .OrderByDescending(d => d.Id)
                 .ToListAsync();
 
-            // 2. Đơn khách đang thuê máy của mình
+            // Đơn khách đang thuê máy của tôi
             viewModel.MyOrders = await _context.Rentals
                 .Include(r => r.Device)
                 .Include(r => r.Renter)
@@ -130,8 +130,8 @@ namespace TechShare.Controllers
             var rental = await _context.Rentals.Include(r => r.Device).FirstOrDefaultAsync(r => r.Id == id);
             if (rental != null && rental.Status == RentalStatus.Disputed)
             {
-                rental.Status = RentalStatus.Cancelled; // Đơn bị hủy do lỗi
-                rental.DepositStatus = DepositStatus.Refunded; // Trả lại cọc cho sinh viên
+                rental.Status = RentalStatus.Cancelled; 
+                rental.DepositStatus = DepositStatus.Refunded; 
                 
                 rental.Device.StockQuantity += rental.Quantity; 
 
@@ -151,8 +151,8 @@ namespace TechShare.Controllers
             var rental = await _context.Rentals.FirstOrDefaultAsync(r => r.Id == id);
             if (rental != null && rental.Status == RentalStatus.Disputed)
             {
-                rental.Status = RentalStatus.Completed; // Vẫn đóng đơn
-                rental.DepositStatus = DepositStatus.Retained; // Tịch thu cọc của khách
+                rental.Status = RentalStatus.Completed; 
+                rental.DepositStatus = DepositStatus.Retained; 
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
