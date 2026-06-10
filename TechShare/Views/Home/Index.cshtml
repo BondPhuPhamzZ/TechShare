@@ -7,31 +7,27 @@
     <div class="container-fluid py-4">
         <h1 class="display-5 fw-bold text-primary">TechShare P2P</h1>
         <p class="col-md-8 mx-auto fs-5 mt-3">
-            Nền tảng thuê thiết bị công nghệ (Laptop, Máy ảnh) uy tín dành cho Sinh viên. 
-            Giải quyết triệt để rủi ro lừa đảo nhờ <strong>Hệ thống Đánh giá Uy tín</strong> và <strong>Chính sách Bảo vệ 2 giờ</strong>.
+            Nền tảng thuê thiết bị công nghệ (Laptop, Máy ảnh) uy tín dành cho Sinh viên.
+            <br />
+            <strong>Hệ thống Đánh giá Uy tín</strong> và <strong>Chính sách Bảo vệ 2 giờ</strong>.
         </p>
-        <form method="get" asp-controller="Home" asp-action="Index" class="d-flex justify-content-center mt-4">
-            <input type="text" name="searchQuery" value="@ViewBag.SearchQuery" class="form-control w-50 me-2" placeholder="Tìm kiếm máy ảnh, laptop, cáp sạc..." />
-            <select name="categoryId" class="form-select w-25 me-2" asp-items="ViewBag.Categories">
-                <option value="">Tất cả danh mục</option>
-            </select>
-            <button class="btn btn-primary px-4" type="submit">Tìm kiếm</button>
-            @if(!string.IsNullOrEmpty(ViewBag.SearchQuery) || ViewBag.Categories?.SelectedValue != null)
-            {
-                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary ms-2">Xóa Lọc</a>
-            }
+        <form asp-controller="Home" asp-action="Index" method="get" class="d-flex justify-content-center mt-4">
+            <input type="text" name="q" value="@ViewData["SearchQuery"]" class="form-control w-50 me-2" placeholder="Tìm kiếm máy ảnh, laptop, cáp sạc..." />
+            <button class="btn btn-primary btn-lg" type="submit">Tìm kiếm</button>
         </form>
     </div>
 </div>
 
 <div class="container mt-5">
     <h3 class="mb-4 fw-bold">Thiết Bị Mới Nhất</h3>
-    
+
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        @if (!Model.Any())
+        @if (Model == null || !Model.Any())
         {
             <div class="col-12">
-                <div class="alert alert-warning text-center">Không tìm thấy thiết bị nào phù hợp với yêu cầu của bạn.</div>
+                <div class="alert alert-warning text-center">
+                    Không tìm thấy thiết bị nào phù hợp với yêu cầu của bạn.
+                </div>
             </div>
         }
         else
