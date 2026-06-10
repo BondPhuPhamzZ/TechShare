@@ -1,4 +1,5 @@
 @model TechShare.ViewModels.ProfileViewModel
+
 @using TechShare.Enums
 @{
     ViewData["Title"] = "Hồ sơ cá nhân";
@@ -19,7 +20,7 @@
 
 <div class="container mt-5 mb-5">
     <div class="row">
-        <!-- Cột Trái: Thông tin User -->
+        @* Cột trái -> Thông tin User *@
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm border-0 text-center p-4">
                 <img src="https://ui-avatars.com/api/?name=@Model.UserInfo.FullName&background=random&size=150" class="rounded-circle mx-auto mb-3 shadow" alt="Avatar" style="width: 150px;">
@@ -35,13 +36,17 @@
             </div>
         </div>
 
-        <!-- Cột Phải: Quản lý Tài sản -->
+        @* Cột phải -> Quản lý tài sản *@
         <div class="col-md-8">
-            <!-- Khu vực 1: Máy đang đem cho thuê (Bài đăng) -->
+
+            @* Thiết bị cho thuê *@
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white fw-bold fs-5 text-primary py-3">
-                    Máy Tính / Camera Của Tôi (Bài Đăng)
+
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                    <span class="fw-bold fs-5 text-primary">Máy Tính / Camera Của Tôi (Bài Đăng)</span>
+                    <a asp-controller="Device" asp-action = "Create" class="btn btn-success btn-sm fw-bold">+ Đăng bài mới</a>
                 </div>
+
                 <div class="card-body">
                     @if (!Model.MyPostedDevices.Any())
                     {
@@ -84,11 +89,13 @@
                 </div>
             </div>
 
-            <!-- Khu vực 2: Máy đang đi mượn -->
+            @* Thiết bị đang thuê *@
             <div class="card shadow-sm border-0">
+
                 <div class="card-header bg-white fw-bold fs-5 text-warning py-3">
-                    Tài Sản Đang Cầm (Đi Thuê)
+                    Thiết bị đang thuê
                 </div>
+
                 <div class="card-body">
                     @if (!Model.MyActiveRentals.Any())
                     {
