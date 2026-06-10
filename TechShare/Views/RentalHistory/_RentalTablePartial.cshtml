@@ -62,7 +62,14 @@
                                     }
                                     else if (rental.Status == TechShare.Enums.RentalStatus.HoanTat)
                                     {
-                                        <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-sm btn-outline-warning">Đánh giá Chủ Máy</a>
+                                        if (!rental.IsReviewed)
+                                        {
+                                            <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-sm btn-outline-warning">Đánh giá Chủ Máy</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="btn btn-sm btn-secondary disabled">Đã đánh giá</span>
+                                        }
                                     }
                                 </td>
                             </tr>

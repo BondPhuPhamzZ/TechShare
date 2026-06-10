@@ -74,8 +74,9 @@ namespace TechShare.Controllers
 
             float average = (float)allReviews.Average(r => r.Rating);
             
-            // Cập nhật điểm cho Chủ thiết bị
+            // Cập nhật điểm cho Chủ thiết bị và đánh dấu đơn đã review
             rental.Device.Owner.ReputationScore = average;
+            rental.IsReviewed = true;
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index", "RentalHistory");
