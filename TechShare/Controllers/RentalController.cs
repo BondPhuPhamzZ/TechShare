@@ -33,6 +33,25 @@ namespace TechShare.Controllers
             if (device == null) 
                 return NotFound();
 
+            var today = DateTime.Now.Date;
+            if (startDate.Date <= today)
+            {
+                TempData["ErrorMessage"] = "Ngày bắt đầu thuê phải từ ngày mai trở đi để Cửa hàng kịp chuẩn bị máy.";
+                return RedirectToAction("Detail", "Device", new { id = deviceId });
+            }
+
+            if (startDate.Date > today.AddDays(30))
+            {
+                TempData["ErrorMessage"] = "Bạn chỉ có thể đặt thuê trước tối đa 30 ngày.";
+                return RedirectToAction("Detail", "Device", new { id = deviceId });
+            }
+
+            if (endDate.Date < startDate.Date)
+            {
+                TempData["ErrorMessage"] = "Ngày trả máy không được trước Ngày nhận máy.";
+                return RedirectToAction("Detail", "Device", new { id = deviceId });
+            }
+
             int rentDays = (endDate - startDate).Days;
             if (rentDays <= 0) 
                 rentDays = 1; 
@@ -57,6 +76,13 @@ namespace TechShare.Controllers
             var device = await _context.Devices.FindAsync(deviceId);
             if (device == null) 
                 return NotFound();
+
+            var today = DateTime.Now.Date;
+            if (startDate.Date <= today || startDate.Date > today.AddDays(30) || endDate.Date < startDate.Date)
+            {
+                TempData["ErrorMessage"] = "Thông tin ngày thuê không hợp lệ. Vui lòng chọn lại.";
+                return RedirectToAction("Detail", "Device", new { id = deviceId });
+            }
 
             int rentDays = (endDate - startDate).Days;
             if (rentDays <= 0) 

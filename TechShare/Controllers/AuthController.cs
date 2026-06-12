@@ -46,6 +46,11 @@ namespace TechShare.Controllers
 
                     await HttpContext.SignInAsync("Cookies", principal);
 
+                    if (user.Role == "Admin")
+                    {
+                        return RedirectToAction("Index", "Admin");
+                    }
+
                     return RedirectToAction("Index", "Home");
                 }
                 

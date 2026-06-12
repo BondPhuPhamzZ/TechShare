@@ -22,7 +22,10 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Trang Chủ</a>
                         </li>
-                        @if (User.Identity.IsAuthenticated)
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Device" asp-action="Catalog">Danh mục sản phẩm</a>
+                        </li>
+                        @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Order" asp-action="Index">Đơn Đi Thuê</a>
@@ -42,9 +45,12 @@
                             <li class="nav-item d-flex align-items-center me-3">
                                 <span class="navbar-text text-dark">Xin chào, <strong>@User.Identity.Name</strong></span>
                             </li>
-                            <li class="nav-item">
-                                <a class="btn btn-outline-primary me-2" asp-controller="Profile" asp-action="Index">Hồ sơ cá nhân</a>
-                            </li>
+                            @if (!User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="btn btn-outline-primary me-2" asp-controller="Profile" asp-action="Index">Hồ sơ cá nhân</a>
+                                </li>
+                            }
                             <li class="nav-item">
                                 <a class="btn btn-danger" asp-controller="Auth" asp-action="Logout">Đăng xuất</a>
                             </li>

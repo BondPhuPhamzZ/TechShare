@@ -40,6 +40,13 @@
                 <hr />
 
 
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger fw-bold shadow-sm">
+                        <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                    </div>
+                }
+
                 <!-- Form giả lập hành động -->
                 <form action="/Rental/Checkout" method="get">
                     <input type="hidden" name="deviceId" value="@Model.Id" />

@@ -19,8 +19,8 @@
                 <p class="text-start mb-3"><small class="text-muted">Ngày tham gia:</small> <strong>@Model.UserInfo.CreatedAt.ToString("dd/MM/yyyy")</strong></p>
                 
                 <div class="d-grid gap-2">
-                    <button class="btn btn-outline-primary">Chỉnh sửa hồ sơ</button>
-                    <button class="btn btn-outline-secondary">Đổi mật khẩu</button>
+                    <a asp-action="EditProfile" class="btn btn-primary fw-bold">Sửa hồ sơ</a>
+                    <a asp-action="ChangePassword" class="btn btn-outline-danger fw-bold">Đổi mật khẩu</a>
                 </div>
             </div>
             

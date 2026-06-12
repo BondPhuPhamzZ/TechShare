@@ -17,29 +17,14 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string q, int? categoryId)
+        public async Task<IActionResult> Index()
         {
-            var query = _context.Devices
+            var devices = await _context.Devices
                 .Include(d => d.Category) 
-                .Where(d => d.Status == DeviceStatus.SanSang && d.StockQuantity > 0);
-
-            if (!string.IsNullOrEmpty(q))
-            {
-                query = query.Where(d => d.Name.Contains(q));
-            }
-
-            if (categoryId.HasValue)
-            {
-                query = query.Where(d => d.CategoryId == categoryId.Value);
-            }
-
-            var devices = await query
-                .OrderByDescending(d => d.Id) 
+                .Where(d => d.Status == DeviceStatus.SanSang && d.StockQuantity > 0)
+                .OrderByDescending(d => d.Id)
+                .Take(6)
                 .ToListAsync();
-
-            ViewData["SearchQuery"] = q;
-            ViewData["CategoryId"] = categoryId;
-            ViewData["Categories"] = await _context.Categories.ToListAsync();
 
             return View(devices);
         }

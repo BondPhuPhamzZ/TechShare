@@ -1,0 +1,59 @@
+@model IEnumerable<TechShare.Models.Device>
+@{
+    ViewData["Title"] = "Danh Mục Thiết Bị";
+}
+
+<div class="p-5 mb-4 bg-light rounded-3 text-center shadow-sm">
+    <div class="container-fluid py-4">
+        <h1 class="display-5 fw-bold text-primary">Danh Mục Thiết Bị</h1>
+        <p class="col-md-8 mx-auto fs-5 mt-3">
+            Khám phá kho thiết bị công nghệ hiện đại, chất lượng cao tại TechShare.
+        </p>
+        <form asp-controller="Device" asp-action="Catalog" method="get" class="d-flex justify-content-center mt-4">
+            <input type="text" name="q" value="@ViewData["SearchQuery"]" class="form-control w-50 me-2" placeholder="Tìm kiếm máy ảnh, laptop, cáp sạc..." />
+            
+            @{
+                var categories = ViewData["Categories"] as List<TechShare.Models.Category> ?? new List<TechShare.Models.Category>();
+                int? currentCatId = ViewData["CategoryId"] as int?;
+            }
+            <select name="categoryId" class="form-select w-25 me-2">
+                <option value="">Tất cả danh mục</option>
+                @foreach (var cat in categories)
+                {
+                    if (currentCatId == cat.Id)
+                    {
+                        <option value="@cat.Id" selected>@cat.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                }
+            </select>
+
+            <button class="btn btn-primary btn-lg" type="submit">Tìm kiếm</button>
+        </form>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h3 class="mb-4 fw-bold">Thiết Bị Mới Nhất</h3>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    Không tìm thấy thiết bị nào phù hợp với yêu cầu của bạn.
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <partial name="_DeviceCard" model="item" />
+            }
+        }
+    </div>
+</div>

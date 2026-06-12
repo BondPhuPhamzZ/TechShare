@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using System;
 using System.IO;
 using System.Linq;
+using TechShare.Enums;
 
 namespace TechShare.Controllers
 {
@@ -41,6 +42,33 @@ namespace TechShare.Controllers
             }
 
             return View(device);
+        }
+
+        public async Task<IActionResult> Catalog(string q, int? categoryId)
+        {
+            var query = _context.Devices
+                .Include(d => d.Category) 
+                .Where(d => d.Status == DeviceStatus.SanSang && d.StockQuantity > 0);
+
+            if (!string.IsNullOrEmpty(q))
+            {
+                query = query.Where(d => d.Name.Contains(q));
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(d => d.CategoryId == categoryId.Value);
+            }
+
+            var devices = await query
+                .OrderByDescending(d => d.Id) 
+                .ToListAsync();
+
+            ViewData["SearchQuery"] = q;
+            ViewData["CategoryId"] = categoryId;
+            ViewData["Categories"] = await _context.Categories.ToListAsync();
+
+            return View(devices);
         }
 
         // Trang upload thiết bị
