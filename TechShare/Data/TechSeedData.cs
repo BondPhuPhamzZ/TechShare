@@ -5,7 +5,7 @@ using System.Linq;
 namespace TechShare.Data
 {
     // ========== SEED DATA ==========
-    public static class DbInitializer
+    public static class TechSeedData
     {
         public static void Initialize(TechShareDbContext context)
         {

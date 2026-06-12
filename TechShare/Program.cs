@@ -53,7 +53,7 @@ builder.Services.AddAuthentication("Cookies")
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<TechShareDbContext>();
-                DbInitializer.Initialize(context);
+                TechSeedData.Initialize(context);
             }
 
             app.Run();

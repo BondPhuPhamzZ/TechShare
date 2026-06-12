@@ -44,7 +44,7 @@ namespace TechShare.Controllers
         }
 
         // Trang upload thiết bị
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: Device/Create
         public async Task<IActionResult> Create()
         {
@@ -53,7 +53,7 @@ namespace TechShare.Controllers
         }
 
         // Xử lý đăng thiết bị cho thuê lên
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DeviceCreateViewModel model)

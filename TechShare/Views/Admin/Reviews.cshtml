@@ -1,0 +1,62 @@
+@model IEnumerable<TechShare.Models.Review>
+@{
+    ViewData["Title"] = "Quản lý Đánh giá";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Kiểm duyệt Đánh Giá</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th>Khách Hàng</th>
+                        <th>Thiết Bị</th>
+                        <th>Đánh Giá</th>
+                        <th>Bình Luận</th>
+                        <th>Ngày Viết</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>#@item.Id</td>
+                                <td><strong>@item.Reviewer.FullName</strong></td>
+                                <td>@(item.Rental?.Device?.Name ?? "N/A")</td>
+                                <td>
+                                    @for (int i = 0; i < item.Rating; i++)
+                                    {
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    }
+                                    @for (int i = item.Rating; i < 5; i++)
+                                    {
+                                        <i class="bi bi-star text-warning"></i>
+                                    }
+                                </td>
+                                <td><span class="text-muted">"@item.Comment"</span></td>
+                                <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-eye-slash"></i> Ẩn / Xóa</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Chưa có đánh giá nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

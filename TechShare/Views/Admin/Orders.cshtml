@@ -1,0 +1,106 @@
+@model IEnumerable<TechShare.Models.Rental>
+@{
+    ViewData["Title"] = "Quản lý Đơn thuê";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Danh sách Đơn Thuê</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Khách Hàng</th>
+                        <th>Thiết Bị</th>
+                        <th>Thời Gian Thuê</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td><span class="badge bg-secondary">#@item.Id</span></td>
+                                <td>
+                                    <strong>@item.User.FullName</strong><br/>
+                                    <small class="text-muted">@item.User.PhoneNumber</small>
+                                </td>
+                                <td>@item.Device.Name</td>
+                                <td>
+                                    @item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")<br/>
+                                    <small class="text-muted">(@((item.EndDate - item.StartDate).Days) ngày)</small>
+                                </td>
+                                <td>
+                                    <span class="text-danger fw-bold">@item.TotalPrice.ToString("N0") đ</span><br/>
+                                    <small class="text-muted">Cọc: @item.DepositAmount.ToString("N0") đ</small>
+                                </td>
+                                <td>
+                                    @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
+                                    {
+                                        <span class="badge bg-warning text-dark">Chờ Duyệt</span>
+                                    }
+                                    else if (item.Status == TechShare.Enums.RentalStatus.DaDatCoc)
+                                    {
+                                        <span class="badge bg-info text-dark">Đã Cọc</span>
+                                    }
+                                    else if (item.Status == TechShare.Enums.RentalStatus.DaDuyet)
+                                    {
+                                        <span class="badge bg-primary">Đã Duyệt</span>
+                                    }
+                                    else if (item.Status == TechShare.Enums.RentalStatus.DangThue)
+                                    {
+                                        <span class="badge bg-success">Đang Thuê</span>
+                                    }
+                                    else if (item.Status == TechShare.Enums.RentalStatus.HoanTat)
+                                    {
+                                        <span class="badge bg-dark">Hoàn Tất</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Đã Hủy</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            Cập nhật
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet || item.Status == TechShare.Enums.RentalStatus.DaDatCoc)
+                                            {
+                                                <li><a class="dropdown-item text-success" href="#">Duyệt Đơn</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#">Từ Chối (Hoàn Cọc)</a></li>
+                                            }
+                                            @if (item.Status == TechShare.Enums.RentalStatus.DaDuyet)
+                                            {
+                                                <li><a class="dropdown-item text-primary" href="#">Xác nhận Giao Máy</a></li>
+                                            }
+                                            @if (item.Status == TechShare.Enums.RentalStatus.DangThue)
+                                            {
+                                                <li><a class="dropdown-item text-dark" href="#">Xác nhận Trả Máy (Hoàn Tất)</a></li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Chưa có đơn thuê nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

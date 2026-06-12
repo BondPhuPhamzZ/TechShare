@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TechShare P2P</title>
+    <title>@ViewData["Title"] - TechShare B2C</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TechShare.styles.css" asp-append-version="true" />
@@ -25,18 +25,18 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="RentalHistory" asp-action="Index">Đơn Đi Thuê</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Host" asp-action="Index">Kênh Chủ Máy</a>
+                                <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Order" asp-action="Index">Đơn Đi Thuê</a>
                             </li>
                         }
                     </ul>
                     
                     <ul class="navbar-nav ms-auto align-items-center">
-                        <li class="nav-item me-3">
-                            <a class="btn btn-warning fw-bold shadow-sm" asp-controller="Device" asp-action="Create">+ Đăng Tin Cho Thuê</a>
-                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item me-3">
+                                <a class="btn btn-warning fw-bold shadow-sm" asp-controller="Admin" asp-action="Index">Kênh Quản Trị (Admin)</a>
+                            </li>
+                        }
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item d-flex align-items-center me-3">
@@ -71,7 +71,7 @@
 
     <footer class="border-top footer text-muted fixed-bottom bg-white pt-3 pb-3 shadow">
         <div class="container text-center fw-bold">
-            &copy; 2026 - TechShare P2P - Mạng lưới Thuê Thiết Bị Công Nghệ Tin Cậy
+            &copy; 2026 - TechShare B2C - Cửa Hàng Cho Thuê Thiết Bị Công Nghệ
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
