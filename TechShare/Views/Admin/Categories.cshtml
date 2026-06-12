@@ -16,7 +16,6 @@
                     <tr>
                         <th style="width: 60px;">ID</th>
                         <th>Tên Danh Mục</th>
-                        <th>Mô tả</th>
                         <th>Số Thiết Bị</th>
                         <th class="text-end">Thao tác</th>
                     </tr>
@@ -29,7 +28,6 @@
                             <tr>
                                 <td>#@item.Id</td>
                                 <td><strong>@item.Name</strong></td>
-                                <td>@item.Description</td>
                                 <td><span class="badge bg-secondary">@(item.Devices?.Count ?? 0) thiết bị</span></td>
                                 <td class="text-end">
                                     <button class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Sửa</button>

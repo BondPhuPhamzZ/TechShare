@@ -30,8 +30,8 @@
                             <tr>
                                 <td><span class="badge bg-secondary">#@item.Id</span></td>
                                 <td>
-                                    <strong>@item.User.FullName</strong><br/>
-                                    <small class="text-muted">@item.User.PhoneNumber</small>
+                                    <strong>@item.Renter.FullName</strong><br/>
+                                    <small class="text-muted">@item.Renter.PhoneNumber</small>
                                 </td>
                                 <td>@item.Device.Name</td>
                                 <td>
@@ -40,14 +40,14 @@
                                 </td>
                                 <td>
                                     <span class="text-danger fw-bold">@item.TotalPrice.ToString("N0") đ</span><br/>
-                                    <small class="text-muted">Cọc: @item.DepositAmount.ToString("N0") đ</small>
+                                    <small class="text-muted">Cọc: @item.Device.DepositAmount.ToString("N0") đ</small>
                                 </td>
                                 <td>
                                     @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
                                     {
                                         <span class="badge bg-warning text-dark">Chờ Duyệt</span>
                                     }
-                                    else if (item.Status == TechShare.Enums.RentalStatus.DaDatCoc)
+                                    else if (item.DepositStatus == TechShare.Enums.DepositStatus.DaThanhToan && item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
                                     {
                                         <span class="badge bg-info text-dark">Đã Cọc</span>
                                     }
@@ -74,7 +74,7 @@
                                             Cập nhật
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end">
-                                            @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet || item.Status == TechShare.Enums.RentalStatus.DaDatCoc)
+                                            @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
                                             {
                                                 <li><a class="dropdown-item text-success" href="#">Duyệt Đơn</a></li>
                                                 <li><a class="dropdown-item text-danger" href="#">Từ Chối (Hoàn Cọc)</a></li>

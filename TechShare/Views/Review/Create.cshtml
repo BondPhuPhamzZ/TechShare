@@ -1,6 +1,6 @@
 @model TechShare.Models.Rental
 @{
-    ViewData["Title"] = "Đánh Giá Uy Tín Chủ Máy";
+    ViewData["Title"] = "Đánh Giá Thiết Bị & Cửa Hàng";
 }
 
 <div class="container mt-5">
@@ -8,10 +8,10 @@
         <div class="col-md-6">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-warning text-dark text-center fw-bold fs-5 py-3">
-                    ĐÁNH GIÁ UY TÍN CHỦ MÁY
+                    ĐÁNH GIÁ THIẾT BỊ VÀ CỬA HÀNG
                 </div>
                 <div class="card-body p-4">
-                    <p class="text-center text-muted mb-4">Bạn vừa hoàn thành việc thuê <strong>@Model.Device.Name</strong>. Để xây dựng hệ thống minh bạch, hãy đánh giá mức độ hài lòng của bạn nhé!</p>
+                    <p class="text-center text-muted mb-4">Bạn vừa hoàn thành việc thuê <strong>@Model.Device.Name</strong>. Để Cửa Hàng ngày một tốt hơn, hãy để lại đánh giá của bạn nhé!</p>
                     
                     <form action="/Review/SubmitReview" method="post">
                         @Html.AntiForgeryToken()
@@ -30,7 +30,7 @@
 
                         <div class="mb-4">
                             <label class="form-label fw-bold">Nhận xét của bạn (Mọi người sẽ đọc được)</label>
-                            <textarea class="form-control" name="comment" rows="4" placeholder="Ví dụ: Máy dùng tốt, đúng như mô tả. Anh chủ hỗ trợ nhiệt tình..."></textarea>
+                            <textarea class="form-control" name="comment" rows="4" placeholder="Ví dụ: Máy dùng tốt, đúng như mô tả. Cửa hàng hỗ trợ nhiệt tình..."></textarea>
                         </div>
                         
                         <div class="d-flex justify-content-between">

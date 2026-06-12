@@ -84,7 +84,7 @@
                         {
                             <tr>
                                 <td><span class="badge bg-secondary">#@item.Id</span></td>
-                                <td>@item.User.FullName</td>
+                                <td>@item.Renter.FullName</td>
                                 <td>@item.Device.Name</td>
                                 <td>@item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")</td>
                                 <td>
@@ -92,7 +92,7 @@
                                     {
                                         <span class="badge bg-warning text-dark">Chờ Duyệt</span>
                                     }
-                                    else if (item.Status == TechShare.Enums.RentalStatus.DaDatCoc)
+                                    else if (item.DepositStatus == TechShare.Enums.DepositStatus.DaThanhToan && item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
                                     {
                                         <span class="badge bg-info text-dark">Đã Đặt Cọc</span>
                                     }

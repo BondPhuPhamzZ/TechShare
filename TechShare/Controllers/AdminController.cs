@@ -37,10 +37,10 @@ namespace TechShare.Controllers
 
             // Đơn hàng cần xử lý (Chờ duyệt)
             var pendingOrders = await _context.Rentals
-                .Include(r => r.User)
+                .Include(r => r.Renter)
                 .Include(r => r.Device)
-                .Where(r => r.Status == Enums.RentalStatus.ChoDuyet || r.Status == Enums.RentalStatus.DaDatCoc)
-                .OrderByDescending(r => r.CreatedAt)
+                .Where(r => r.Status == Enums.RentalStatus.ChoDuyet)
+                .OrderByDescending(r => r.Id)
                 .Take(5)
                 .ToListAsync();
 
@@ -65,9 +65,9 @@ namespace TechShare.Controllers
         public async Task<IActionResult> Orders()
         {
             var orders = await _context.Rentals
-                .Include(r => r.User)
+                .Include(r => r.Renter)
                 .Include(r => r.Device)
-                .OrderByDescending(r => r.CreatedAt)
+                .OrderByDescending(r => r.Id)
                 .ToListAsync();
             return View(orders);
         }

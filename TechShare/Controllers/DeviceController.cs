@@ -94,6 +94,7 @@ namespace TechShare.Controllers
                     PricePerDay = model.PricePerDay,
                     DepositAmount = model.DepositAmount,
                     StockQuantity = model.StockQuantity,
+                    Description = model.Description,
                     ImageUrl = "/images/" + uniqueFileName
                 };
 
