@@ -18,9 +18,9 @@ namespace TechShare.Data
 
             var users = new User[]
             {
-                new User { FullName = "Nguyễn Văn Admin", Email = "admin@gmail.com", PasswordHash = "123", PhoneNumber = "0123456789", Role = "Admin" },
-                new User { FullName = "Trần Thị Khách", Email = "khach@gmail.com", PasswordHash = "123", PhoneNumber = "0987654321", Role = "User" },
-                new User { FullName = "Lê Văn Hàng", Email = "hang@gmail.com", PasswordHash = "123", PhoneNumber = "0999888777", Role = "User" }
+                new User { Username = "admin", FullName = "Nguyễn Văn Admin", Email = "admin@gmail.com", PasswordHash = "123", PhoneNumber = "0123456789", Role = "Admin" },
+                new User { Username = "khach", FullName = "Trần Thị Khách", Email = "khach@gmail.com", PasswordHash = "123", PhoneNumber = "0987654321", Role = "User" },
+                new User { Username = "hang", FullName = "Lê Văn Hàng", Email = "hang@gmail.com", PasswordHash = "123", PhoneNumber = "0999888777", Role = "User" }
             };
             context.Users.AddRange(users);
             context.SaveChanges();
