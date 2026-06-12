@@ -12,9 +12,7 @@ namespace TechShare.Models
         public DateTime StartDate { get; set; } 
         public DateTime EndDate { get; set; }
         
-        // Thời điểm chủ máy giao thiết bị (đếm ngược 2H)
-        public DateTime? ActualHandoverTime { get; set; } 
-        
+
         public int Quantity { get; set; } = 1; 
         
         [Column(TypeName = "decimal(18,2)")]

@@ -14,11 +14,11 @@ namespace TechShare.Controllers
     // Trạng thái/ tiến độ thuê thiết bị
 
     [Authorize]
-    public class RentalHistoryController : Controller
+    public class OrderController : Controller
     {
         private readonly TechShareDbContext _context;
 
-        public RentalHistoryController(TechShareDbContext context)
+        public OrderController(TechShareDbContext context)
         {
             _context = context;
         }
@@ -30,25 +30,22 @@ namespace TechShare.Controllers
             if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) 
                 return RedirectToAction("Login", "Auth");
 
-            var viewModel = new RentalHistoryViewModel();
+            var viewModel = new OrderViewModel();
 
             viewModel.ActiveRentals = await _context.Rentals
                 .Include(r => r.Device)
-                .ThenInclude(d => d.Owner)
-                .Where(r => r.RenterId == userId && (r.Status == RentalStatus.DangThue || r.Status == RentalStatus.ChoGiao || r.Status == RentalStatus.TranhChap || r.Status == RentalStatus.DangCheck))
+                .Where(r => r.RenterId == userId && (r.Status == RentalStatus.DangThue || r.Status == RentalStatus.DangGiao || r.Status == RentalStatus.TranhChap))
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
 
             viewModel.PendingRentals = await _context.Rentals
                 .Include(r => r.Device)
-                .ThenInclude(d => d.Owner)
                 .Where(r => r.RenterId == userId && r.Status == RentalStatus.ChoDuyet)
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
 
             viewModel.CompletedRentals = await _context.Rentals
                 .Include(r => r.Device)
-                .ThenInclude(d => d.Owner)
                 .Where(r => r.RenterId == userId && (r.Status == RentalStatus.HoanTat || r.Status == RentalStatus.DaHuy || r.Status == RentalStatus.ChoTra))
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
@@ -56,35 +53,30 @@ namespace TechShare.Controllers
             return View(viewModel); 
         }
 
-        // Khách đã test xong và xác nhận -> Bắt đầu tính 2h
+        // Khách đã nhận được máy
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmHandover(int id)
         {
             var rental = await _context.Rentals.FindAsync(id);
-            if (rental != null && rental.Status == RentalStatus.DangCheck)
+            if (rental != null && rental.Status == RentalStatus.DangGiao)
             {
                 rental.Status = RentalStatus.DangThue;
-                rental.ActualHandoverTime = DateTime.Now; 
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
         }
 
-        // Khách thuê báo lỗi (chỉ dc phép trong 2h đầu)
+        // Khách thuê báo lỗi
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReportIssue(int id)
         {
             var rental = await _context.Rentals.FindAsync(id);
-            // Chỉ được báo lỗi nếu trạng thái là DangThue và chưa quá 2 tiếng từ lúc bàn giao
             if (rental != null && rental.Status == RentalStatus.DangThue)
             {
-                if (rental.ActualHandoverTime.HasValue && (DateTime.Now - rental.ActualHandoverTime.Value).TotalHours <= 2)
-                {
-                    rental.Status = RentalStatus.TranhChap;
-                    await _context.SaveChangesAsync();
-                }
+                rental.Status = RentalStatus.TranhChap;
+                await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
         }

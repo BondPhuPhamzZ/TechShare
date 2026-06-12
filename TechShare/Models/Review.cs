@@ -22,7 +22,5 @@ namespace TechShare.Models
         public int ReviewerId { get; set; }
         public User Reviewer { get; set; } = null!;
 
-        public int RevieweeId { get; set; }
-        public User Reviewee { get; set; } = null!;
     }
 }

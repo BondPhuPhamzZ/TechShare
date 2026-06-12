@@ -1,4 +1,4 @@
-@model TechShare.ViewModels.RentalHistoryViewModel
+@model TechShare.ViewModels.OrderViewModel
 @{
     ViewData["Title"] = "Đơn đi thuê của tôi";
 }
@@ -52,8 +52,8 @@
         return status switch
         {
             TechShare.Enums.RentalStatus.ChoDuyet => "Chờ duyệt",
-            TechShare.Enums.RentalStatus.ChoGiao => "Chờ Giao Máy",
-            TechShare.Enums.RentalStatus.DangCheck => "Khách đang check",
+            TechShare.Enums.RentalStatus.DaDuyet => "Đã duyệt",
+            TechShare.Enums.RentalStatus.DangGiao => "Đang giao máy",
             TechShare.Enums.RentalStatus.DangThue => "Đang Thuê",
             TechShare.Enums.RentalStatus.ChoTra => "Chờ kiểm tra trả",
             TechShare.Enums.RentalStatus.HoanTat => "Hoàn Tất",
@@ -68,7 +68,7 @@
         return status switch
         {
             TechShare.Enums.RentalStatus.ChoDuyet => "bg-warning text-dark",
-            TechShare.Enums.RentalStatus.ChoGiao => "bg-info text-dark",
+            TechShare.Enums.RentalStatus.DaDuyet => "bg-info text-dark",
             TechShare.Enums.RentalStatus.DangThue => "bg-primary",
             TechShare.Enums.RentalStatus.HoanTat => "bg-success",
             TechShare.Enums.RentalStatus.TranhChap => "bg-danger",

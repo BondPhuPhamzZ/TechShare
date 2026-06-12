@@ -15,6 +15,8 @@ namespace TechShare.Models
         
         public string? Description { get; set; }
         
+        public string? Specifications { get; set; }
+        
         public string? ImageUrl { get; set; }
         
         [Column(TypeName = "decimal(18,2)")]
@@ -30,9 +32,6 @@ namespace TechShare.Models
         // Foreign Keys
         public int CategoryId { get; set; }
         public Category Category { get; set; } = null!;
-
-        public int OwnerId { get; set; }
-        public User Owner { get; set; } = null!;
 
         // Navigation Property: Một thiết bị có thể có nhiều đơn thuê
         public ICollection<Rental> Rentals { get; set; } = new List<Rental>();

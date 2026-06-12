@@ -29,11 +29,10 @@ namespace TechShare.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             var device = await _context.Devices
-                .Include(d => d.Owner)
                 .Include(d => d.Category)
                 .Include(d => d.Rentals)
                     .ThenInclude(r => r.Review)
-                        .ThenInclude(rev => rev.Reviewer) // Lấy thông tin người đánh giá
+                        .ThenInclude(rev => rev.Reviewer) 
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (device == null)
@@ -49,13 +48,6 @@ namespace TechShare.Controllers
         // GET: Device/Create
         public async Task<IActionResult> Create()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var user = await _context.Users.FindAsync(userId);
-            if (user != null && !user.IsVerified)
-            {
-                return RedirectToAction("VerifyIdentity", "Profile");
-            }
-
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
@@ -95,7 +87,6 @@ namespace TechShare.Controllers
                 }
 
                 // Tạo thông tin thiết bị lưu vào DB
-                var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var device = new Device()
                 {
                     Name = model.Name,
@@ -103,15 +94,14 @@ namespace TechShare.Controllers
                     PricePerDay = model.PricePerDay,
                     DepositAmount = model.DepositAmount,
                     StockQuantity = model.StockQuantity,
-                    ImageUrl = "/images/" + uniqueFileName,
-                    OwnerId = int.Parse(userIdStr)
+                    ImageUrl = "/images/" + uniqueFileName
                 };
 
                 _context.Devices.Add(device);
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Đăng bài thành công!";
-                return RedirectToAction("Index", "Host");
+                return RedirectToAction("Index", "Admin");
             }
 
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");

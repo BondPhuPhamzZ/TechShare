@@ -19,13 +19,6 @@ namespace TechShare.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Thiết lập quan hệ User (Owner) - Device (1-N)
-            modelBuilder.Entity<Device>()
-                .HasOne(d => d.Owner)
-                .WithMany(u => u.Devices)
-                .HasForeignKey(d => d.OwnerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // User - Rental 
             modelBuilder.Entity<Rental>()
                 .HasOne(r => r.Renter)
@@ -40,12 +33,6 @@ namespace TechShare.Data
                 .HasForeignKey(r => r.ReviewerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Review>()
-                .HasOne(r => r.Reviewee)
-                .WithMany() 
-                .HasForeignKey(r => r.RevieweeId)
-                .OnDelete(DeleteBehavior.Restrict);
-                
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Rental)
                 .WithOne(r => r.Review)

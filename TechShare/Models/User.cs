@@ -25,8 +25,8 @@ namespace TechShare.Models
         [MaxLength(15)]
         public string? PhoneNumber { get; set; }
         
-        [MaxLength(20)]
-        public string? StudentId { get; set; }
+        [MaxLength(200)]
+        public string? Address { get; set; }
         
         public float ReputationScore { get; set; } = 5.0f;
         
@@ -34,11 +34,8 @@ namespace TechShare.Models
 
         public string Role { get; set; } = "User"; // User / Admin
 
-        // Thông tin xác thực (KYC)
-        public bool IsVerified { get; set; } = false;
-        
-        [RegularExpression(@"^\d{12}$", ErrorMessage = "CCCD phải gồm đúng 12 chữ số")]
-        public string? IdCardNumber { get; set; }
+        // Khóa tài khoản
+        public bool IsLocked { get; set; } = false;
 
         public ICollection<Device> Devices { get; set; } = new List<Device>();
         public ICollection<Rental> Rentals { get; set; } = new List<Rental>();

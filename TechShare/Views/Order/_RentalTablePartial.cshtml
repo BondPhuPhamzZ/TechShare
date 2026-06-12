@@ -8,7 +8,7 @@
                     <tr>
                         <th>Mã Đơn</th>
                         <th>Thiết bị</th>
-                        <th>Chủ máy</th>
+
                         <th>Ngày mượn - Ngày trả</th>
                         <th>Trạng thái</th>
                         <th class="text-end">Thao tác</th>
@@ -33,7 +33,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><a asp-controller="Profile" asp-action="Detail" asp-route-id="@rental.Device.OwnerId" class="fw-bold text-dark text-decoration-none">@rental.Device.Owner.FullName</a></td>
+
                                 <td>
                                     <div>@rental.StartDate.ToString("dd/MM/yyyy")</div>
                                     <div class="text-danger fw-bold">@rental.EndDate.ToString("dd/MM/yyyy")</div>
@@ -42,29 +42,29 @@
                                     <span class="badge @(GetBadge(rental.Status))">@(GetStatus(rental.Status))</span>
                                 </td>
                                 <td class="text-end">
-                                    @if (rental.Status == TechShare.Enums.RentalStatus.DangCheck)
+                                    @if (rental.Status == TechShare.Enums.RentalStatus.DangGiao)
                                     {
-                                        <form asp-controller="RentalHistory" asp-action="ConfirmHandover" method="post" class="d-inline">
+                                        <form asp-controller="Order" asp-action="ConfirmHandover" method="post" class="d-inline">
                                             <input type="hidden" name="id" value="@rental.Id" />
-                                            <button type="submit" class="btn btn-sm btn-primary">Đã nhận máy (Bắt đầu 2H test)</button>
+                                            <button type="submit" class="btn btn-sm btn-primary">Đã nhận được máy</button>
                                         </form>
                                     }
                                     else if (rental.Status == TechShare.Enums.RentalStatus.DangThue)
                                     {
-                                        <form asp-controller="RentalHistory" asp-action="ReportIssue" method="post" class="d-inline">
+                                        <form asp-controller="Order" asp-action="ReportIssue" method="post" class="d-inline">
                                             <input type="hidden" name="id" value="@rental.Id" />
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn phát hiện máy có lỗi? Đơn sẽ bị khóa.')">Báo Lỗi</button>
                                         </form>
-                                        <form asp-controller="RentalHistory" asp-action="ReturnDevice" method="post" class="d-inline ms-1">
+                                        <form asp-controller="Order" asp-action="ReturnDevice" method="post" class="d-inline ms-1">
                                             <input type="hidden" name="id" value="@rental.Id" />
-                                            <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Xác nhận trả máy lại cho Chủ?')">Trả Máy</button>
+                                            <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Xác nhận trả máy?')">Trả Máy</button>
                                         </form>
                                     }
                                     else if (rental.Status == TechShare.Enums.RentalStatus.HoanTat)
                                     {
                                         if (!rental.IsReviewed)
                                         {
-                                            <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-sm btn-outline-warning">Đánh giá Chủ Máy</a>
+                                            <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-sm btn-outline-warning">Đánh giá Sản phẩm</a>
                                         }
                                         else
                                         {
@@ -87,8 +87,8 @@
         return status switch
         {
             TechShare.Enums.RentalStatus.ChoDuyet => "Chờ duyệt",
-            TechShare.Enums.RentalStatus.ChoGiao => "Chờ Giao Máy",
-            TechShare.Enums.RentalStatus.DangCheck => "Khách đang check",
+            TechShare.Enums.RentalStatus.DaDuyet => "Đã duyệt",
+            TechShare.Enums.RentalStatus.DangGiao => "Đang giao máy",
             TechShare.Enums.RentalStatus.DangThue => "Đang Thuê",
             TechShare.Enums.RentalStatus.ChoTra => "Chờ kiểm tra trả",
             TechShare.Enums.RentalStatus.HoanTat => "Hoàn Tất",
@@ -103,7 +103,7 @@
         return status switch
         {
             TechShare.Enums.RentalStatus.ChoDuyet => "bg-warning text-dark",
-            TechShare.Enums.RentalStatus.ChoGiao => "bg-info text-dark",
+            TechShare.Enums.RentalStatus.DaDuyet => "bg-info text-dark",
             TechShare.Enums.RentalStatus.DangThue => "bg-primary",
             TechShare.Enums.RentalStatus.HoanTat => "bg-success",
             TechShare.Enums.RentalStatus.TranhChap => "bg-danger",

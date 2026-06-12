@@ -16,7 +16,6 @@
                         <img src="@Model.ImageUrl" style="width: 80px; height: 80px; object-fit: cover;" class="rounded me-3" />
                         <div>
                             <h5 class="mb-1">@Model.Name</h5>
-                            <span class="text-muted">Chủ máy: @Model.Owner.FullName</span>
                         </div>
                     </div>
                     
@@ -64,7 +63,7 @@
                         
                         <div class="mb-3">
                             <select class="form-select" name="deliveryMethod" required>
-                                <option value="0">Tự đến lấy (Gặp trực tiếp chủ máy)</option>
+                                <option value="0">Tự đến lấy tại Cửa Hàng</option>
                                 <option value="1">Giao hàng tận nơi (Nhập địa chỉ bên dưới)</option>
                             </select>
                         </div>

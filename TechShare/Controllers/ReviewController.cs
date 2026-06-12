@@ -26,7 +26,6 @@ namespace TechShare.Controllers
         {
             var rental = await _context.Rentals
                 .Include(r => r.Device)
-                .ThenInclude(d => d.Owner)
                 .FirstOrDefaultAsync(r => r.Id == rentalId);
 
             if (rental == null || rental.Status != RentalStatus.HoanTat)
@@ -35,7 +34,7 @@ namespace TechShare.Controllers
             bool hasReviewed = await _context.Reviews.AnyAsync(r => r.RentalId == rentalId);
             if (hasReviewed)
             {
-                return RedirectToAction("Index", "RentalHistory");
+                return RedirectToAction("Index", "Order");
             }
 
             return View(rental);
@@ -49,7 +48,6 @@ namespace TechShare.Controllers
             
             var rental = await _context.Rentals
                 .Include(r => r.Device)
-                .ThenInclude(d => d.Owner)
                 .FirstOrDefaultAsync(r => r.Id == rentalId);
 
             if (rental == null) 
@@ -60,26 +58,14 @@ namespace TechShare.Controllers
                 RentalId = rentalId,
                 Rating = rating,
                 Comment = comment,
-                ReviewerId = userId, 
-                RevieweeId = rental.Device.OwnerId 
+                ReviewerId = userId
             };
 
             _context.Reviews.Add(review);
-            await _context.SaveChangesAsync(); // Lưu Reviews vào data -> Tính trung bình
-            
-            // Tính TB 
-            var allReviews = await _context.Reviews
-                .Where(r => r.RevieweeId == rental.Device.OwnerId)
-                .ToListAsync();
-
-            float average = (float)allReviews.Average(r => r.Rating);
-            
-            // Cập nhật điểm cho Chủ thiết bị và đánh dấu đơn đã review
-            rental.Device.Owner.ReputationScore = average;
             rental.IsReviewed = true;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", "RentalHistory");
+            return RedirectToAction("Index", "Order");
         }
     }
 }

@@ -26,14 +26,8 @@ namespace TechShare.Controllers
         public async Task<IActionResult> Checkout(int deviceId, DateTime startDate, DateTime endDate, int quantity)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var user = await _context.Users.FindAsync(userId);
-            if (user != null && !user.IsVerified)
-            {
-                return RedirectToAction("VerifyIdentity", "Profile");
-            }
 
             var device = await _context.Devices
-                .Include(d => d.Owner)
                 .FirstOrDefaultAsync(d => d.Id == deviceId);
 
             if (device == null) 
@@ -59,11 +53,6 @@ namespace TechShare.Controllers
         public async Task<IActionResult> ConfirmCheckout(int deviceId, DateTime startDate, DateTime endDate, int quantity, string deliveryAddress, DeliveryMethod deliveryMethod)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var user = await _context.Users.FindAsync(userId);
-            if (user != null && !user.IsVerified)
-            {
-                return RedirectToAction("VerifyIdentity", "Profile");
-            }
 
             var device = await _context.Devices.FindAsync(deviceId);
             if (device == null) 

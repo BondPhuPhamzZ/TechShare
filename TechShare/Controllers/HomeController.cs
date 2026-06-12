@@ -20,7 +20,6 @@ namespace TechShare.Controllers
         public async Task<IActionResult> Index(string q, int? categoryId)
         {
             var query = _context.Devices
-                .Include(d => d.Owner)    
                 .Include(d => d.Category) 
                 .Where(d => d.Status == DeviceStatus.SanSang && d.StockQuantity > 0);
 
