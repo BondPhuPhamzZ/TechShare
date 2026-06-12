@@ -28,8 +28,6 @@ namespace TechShare.Models
         [MaxLength(200)]
         public string? Address { get; set; }
         
-        public float ReputationScore { get; set; } = 5.0f;
-        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public string Role { get; set; } = "User"; // User / Admin
@@ -37,7 +35,6 @@ namespace TechShare.Models
         // Khóa tài khoản
         public bool IsLocked { get; set; } = false;
 
-        public ICollection<Device> Devices { get; set; } = new List<Device>();
         public ICollection<Rental> Rentals { get; set; } = new List<Rental>();
     }
 }

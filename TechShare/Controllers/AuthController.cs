@@ -78,8 +78,8 @@ namespace TechShare.Controllers
                     Email = model.Email,
                     Username = model.Email, 
                     PhoneNumber = model.PhoneNumber,
-                    PasswordHash = model.Password, 
-                    ReputationScore = 5.0f 
+                    PasswordHash = model.Password,
+                    Role = "User"
                 };
 
                 _context.Users.Add(newUser);
