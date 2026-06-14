@@ -136,5 +136,101 @@ namespace TechShare.Controllers
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             return View(model);
         }
+
+        // Chỉnh sửa thiết bị (GET)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var device = await _context.Devices.FindAsync(id);
+            if (device == null)
+            {
+                return NotFound();
+            }
+
+            var model = new DeviceCreateViewModel
+            {
+                Name = device.Name,
+                CategoryId = device.CategoryId,
+                PricePerDay = device.PricePerDay,
+                DepositAmount = device.DepositAmount,
+                StockQuantity = device.StockQuantity,
+                Description = device.Description
+                // ImageUrl will be kept if ImageFile is null
+            };
+            ViewBag.CurrentImageUrl = device.ImageUrl;
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", device.CategoryId);
+            return View(model);
+        }
+
+        // Xử lý chỉnh sửa thiết bị
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, DeviceCreateViewModel model)
+        {
+            var device = await _context.Devices.FindAsync(id);
+            if (device == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                if (model.ImageFile != null)
+                {
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var extension = Path.GetExtension(model.ImageFile.FileName).ToLower();
+
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError("ImageFile", "Chỉ hỗ trợ file ảnh (.jpg, .jpeg, .png, .gif)");
+                        ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+                        ViewBag.CurrentImageUrl = device.ImageUrl;
+                        return View(model);
+                    }
+
+                    string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.ImageFile.CopyToAsync(fileStream);
+                    }
+                    device.ImageUrl = "/images/" + uniqueFileName;
+                }
+
+                device.Name = model.Name;
+                device.CategoryId = model.CategoryId;
+                device.PricePerDay = model.PricePerDay;
+                device.DepositAmount = model.DepositAmount;
+                device.StockQuantity = model.StockQuantity;
+                device.Description = model.Description;
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Cập nhật thiết bị thành công!";
+                return RedirectToAction("Devices", "Admin");
+            }
+
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+            ViewBag.CurrentImageUrl = device.ImageUrl;
+            return View(model);
+        }
+
+        // Xóa (Ẩn) thiết bị
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var device = await _context.Devices.FindAsync(id);
+            if (device != null)
+            {
+                device.Status = DeviceStatus.BaoTri;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Đã tạm ẩn thiết bị (Chuyển sang trạng thái Bảo trì)!";
+            }
+            return RedirectToAction("Devices", "Admin");
+        }
     }
 }

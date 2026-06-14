@@ -49,12 +49,15 @@
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning text-dark">Tạm Ẩn</span>
+                                        <span class="badge bg-warning text-dark">Bảo Trì / Ẩn</span>
                                     }
                                 </td>
                                 <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Sửa</a>
-                                    <a href="#" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Xóa</a>
+                                    <a asp-controller="Device" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Sửa</a>
+                                    <form asp-controller="Device" asp-action="Delete" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn tạm ẩn thiết bị này?');"><i class="bi bi-trash"></i> Xóa</button>
+                                    </form>
                                 </td>
                             </tr>
                         }

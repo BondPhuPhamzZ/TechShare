@@ -12,6 +12,9 @@ namespace TechShare.Models
         public DateTime StartDate { get; set; } 
         public DateTime EndDate { get; set; }
         
+        // Thời điểm Shop xác nhận đã giao cho khách (dùng để tính 2 tiếng báo lỗi)
+        public DateTime? ShipTime { get; set; }
+        
 
         public int Quantity { get; set; } = 1; 
         

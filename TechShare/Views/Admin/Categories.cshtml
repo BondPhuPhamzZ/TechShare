@@ -7,7 +7,7 @@
 <div class="card shadow-sm border-0">
     <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 fw-bold">Danh sách Danh Mục</h5>
-        <button class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Thêm mới</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCategoryModal"><i class="bi bi-plus-lg me-1"></i> Thêm mới</button>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -30,8 +30,36 @@
                                 <td><strong>@item.Name</strong></td>
                                 <td><span class="badge bg-secondary">@(item.Devices?.Count ?? 0) thiết bị</span></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Sửa</button>
-                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Xóa</button>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editCategoryModal_@item.Id"><i class="bi bi-pencil"></i> Sửa</button>
+                                    <form asp-action="DeleteCategory" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa danh mục này?');"><i class="bi bi-trash"></i> Xóa</button>
+                                    </form>
+
+                                    <!-- Modal Sửa -->
+                                    <div class="modal fade" id="editCategoryModal_@item.Id" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form asp-action="EditCategory" method="post">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Sửa Danh Mục</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        <input type="hidden" name="id" value="@item.Id" />
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Tên danh mục</label>
+                                                            <input type="text" class="form-control" name="categoryName" value="@item.Name" required />
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -44,6 +72,30 @@
                     }
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm -->
+<div class="modal fade" id="createCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="CreateCategory" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm Danh Mục Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tên danh mục</label>
+                        <input type="text" class="form-control" name="categoryName" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm mới</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

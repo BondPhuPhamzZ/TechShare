@@ -120,10 +120,17 @@ namespace TechShare.Controllers
                 return RedirectToAction(nameof(Orders));
             }
 
-            // Nếu hủy đơn (Từ chối) -> Trả lại số lượng máy vào kho
-            if (newStatus == Enums.RentalStatus.DaHuy && rental.Status != Enums.RentalStatus.DaHuy)
+            // Nếu hủy đơn (Từ chối) HOẶC trả máy (Hoàn Tất) -> Trả lại số lượng máy vào kho
+            if ((newStatus == Enums.RentalStatus.DaHuy && rental.Status != Enums.RentalStatus.DaHuy) ||
+                (newStatus == Enums.RentalStatus.HoanTat && rental.Status != Enums.RentalStatus.HoanTat))
             {
                 rental.Device.StockQuantity += rental.Quantity;
+            }
+
+            // Ghi nhận thời điểm Shop giao máy thành công cho khách (bắt đầu tính 2h báo lỗi)
+            if (newStatus == Enums.RentalStatus.DangThue && rental.Status == Enums.RentalStatus.DangGiao)
+            {
+                rental.ShipTime = DateTime.Now;
             }
 
             rental.Status = newStatus;
@@ -131,6 +138,55 @@ namespace TechShare.Controllers
 
             TempData["SuccessMessage"] = $"Đã cập nhật trạng thái đơn #{rental.Id} thành công!";
             return RedirectToAction(nameof(Orders));
+        }
+
+        // Quản lý Danh Mục - Thêm
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(string categoryName)
+        {
+            if (!string.IsNullOrWhiteSpace(categoryName))
+            {
+                var cat = new TechShare.Models.Category { Name = categoryName };
+                _context.Categories.Add(cat);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Đã thêm danh mục mới!";
+            }
+            return RedirectToAction(nameof(Categories));
+        }
+
+        // Quản lý Danh Mục - Sửa
+        [HttpPost]
+        public async Task<IActionResult> EditCategory(int id, string categoryName)
+        {
+            var cat = await _context.Categories.FindAsync(id);
+            if (cat != null && !string.IsNullOrWhiteSpace(categoryName))
+            {
+                cat.Name = categoryName;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Đã cập nhật tên danh mục!";
+            }
+            return RedirectToAction(nameof(Categories));
+        }
+
+        // Quản lý Danh Mục - Xóa
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var cat = await _context.Categories.Include(c => c.Devices).FirstOrDefaultAsync(c => c.Id == id);
+            if (cat != null)
+            {
+                if (cat.Devices != null && cat.Devices.Any())
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa danh mục đang có thiết bị!";
+                }
+                else
+                {
+                    _context.Categories.Remove(cat);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Đã xóa danh mục!";
+                }
+            }
+            return RedirectToAction(nameof(Categories));
         }
     }
 }

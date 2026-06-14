@@ -42,22 +42,21 @@
                                     <span class="badge @(GetBadge(rental.Status))">@(GetStatus(rental.Status))</span>
                                 </td>
                                 <td class="text-end">
-                                    @if (rental.Status == TechShare.Enums.RentalStatus.DangGiao)
+                                    @if (rental.Status == TechShare.Enums.RentalStatus.DangThue)
                                     {
-                                        <form asp-controller="Order" asp-action="ConfirmHandover" method="post" class="d-inline">
-                                            <input type="hidden" name="id" value="@rental.Id" />
-                                            <button type="submit" class="btn btn-sm btn-primary">Đã nhận được máy</button>
-                                        </form>
-                                    }
-                                    else if (rental.Status == TechShare.Enums.RentalStatus.DangThue)
-                                    {
-                                        <form asp-controller="Order" asp-action="ReportIssue" method="post" class="d-inline">
-                                            <input type="hidden" name="id" value="@rental.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn phát hiện máy có lỗi? Đơn sẽ bị khóa.')">Báo Lỗi</button>
-                                        </form>
+                                        // Kiểm tra 2 giờ tính từ lúc Shop giao (ShipTime)
+                                        bool isWithin2Hours = rental.ShipTime.HasValue && DateTime.Now <= rental.ShipTime.Value.AddHours(2);
+                                        
+                                        if (isWithin2Hours)
+                                        {
+                                            <form asp-controller="Order" asp-action="ReportIssue" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@rental.Id" />
+                                                <button type="submit" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Bạn phát hiện máy có lỗi? Đơn sẽ bị khóa để Shop kiểm tra.')">Báo Lỗi</button>
+                                            </form>
+                                        }
                                         <form asp-controller="Order" asp-action="ReturnDevice" method="post" class="d-inline ms-1">
                                             <input type="hidden" name="id" value="@rental.Id" />
-                                            <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Xác nhận trả máy?')">Trả Máy</button>
+                                            <button type="submit" class="btn btn-sm btn-warning mb-1" onclick="return confirm('Xác nhận trả máy?')">Trả Máy</button>
                                         </form>
                                     }
                                     else if (rental.Status == TechShare.Enums.RentalStatus.HoanTat)

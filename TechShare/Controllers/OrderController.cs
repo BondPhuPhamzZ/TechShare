@@ -53,19 +53,7 @@ namespace TechShare.Controllers
             return View(viewModel); 
         }
 
-        // Khách đã nhận được máy
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmHandover(int id)
-        {
-            var rental = await _context.Rentals.FindAsync(id);
-            if (rental != null && rental.Status == RentalStatus.DangGiao)
-            {
-                rental.Status = RentalStatus.DangThue;
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction("Index");
-        }
+
 
         // Khách thuê báo lỗi
         [HttpPost]
