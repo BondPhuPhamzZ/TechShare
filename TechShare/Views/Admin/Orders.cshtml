@@ -63,9 +63,13 @@
                                     {
                                         <span class="badge bg-dark">Hoàn Tất</span>
                                     }
+                                    else if (item.Status == TechShare.Enums.RentalStatus.TranhChap)
+                                    {
+                                        <span class="badge bg-danger">Chờ xử lý sự cố</span>
+                                    }
                                     else
                                     {
-                                        <span class="badge bg-danger">Đã Hủy</span>
+                                        <span class="badge bg-secondary">Đã Hủy</span>
                                     }
                                 </td>
                                 <td class="text-end">
@@ -91,9 +95,16 @@
                                         {
                                             <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangThue" class="btn btn-sm btn-primary fw-bold text-white" onclick="return confirm('Xác nhận Shipper đã giao thành công cho khách?');">Đã giao tới tay khách</button>
                                         }
-                                        else if (item.Status == TechShare.Enums.RentalStatus.DangThue || item.Status == TechShare.Enums.RentalStatus.ChoTra || item.Status == TechShare.Enums.RentalStatus.TranhChap)
+                                        else if (item.Status == TechShare.Enums.RentalStatus.DangThue || item.Status == TechShare.Enums.RentalStatus.ChoTra)
                                         {
                                             <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.HoanTat" class="btn btn-sm btn-dark fw-bold">Xác nhận Trả (Hoàn Tất)</button>
+                                        }
+                                        else if (item.Status == TechShare.Enums.RentalStatus.TranhChap)
+                                        {
+                                            <div class="d-flex flex-column gap-1">
+                                                <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.HoanTat" class="btn btn-sm btn-success fw-bold" onclick="return confirm('Xác nhận Lỗi do Khách? Shop sẽ Giữ Cọc và Hoàn tất đơn.');">Lỗi do Khách (Giữ cọc)</button>
+                                                <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DaHuy" class="btn btn-sm btn-danger fw-bold" onclick="return confirm('Xác nhận Lỗi do Máy? Shop sẽ Hoàn tiền/cọc và Hủy đơn.');">Lỗi do Máy (Hoàn cọc)</button>
+                                            </div>
                                         }
                                     </form>
                                 </td>

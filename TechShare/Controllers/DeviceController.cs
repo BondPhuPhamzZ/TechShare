@@ -48,6 +48,8 @@ namespace TechShare.Controllers
         {
             var query = _context.Devices
                 .Include(d => d.Category) 
+                .Include(d => d.Rentals)
+                    .ThenInclude(r => r.Review)
                 .Where(d => d.Status == DeviceStatus.SanSang && d.StockQuantity > 0);
 
             if (!string.IsNullOrEmpty(q))
