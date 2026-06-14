@@ -107,6 +107,12 @@ namespace TechShare.Controllers
                     }
 
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+                    
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -192,6 +198,12 @@ namespace TechShare.Controllers
                     }
 
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
