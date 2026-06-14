@@ -78,14 +78,20 @@
                                         }
                                         else if (item.Status == TechShare.Enums.RentalStatus.DaDuyet)
                                         {
-                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangGiao" class="btn btn-sm btn-info fw-bold text-dark me-1">Giao Máy (Shipper)</button>
-                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangThue" class="btn btn-sm btn-primary fw-bold text-white">Khách đã nhận</button>
+                                            if (item.DeliveryMethod == TechShare.Enums.DeliveryMethod.GiaoTanNoi)
+                                            {
+                                                <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangGiao" class="btn btn-sm btn-info fw-bold text-dark me-1">Giao Máy (Shipper)</button>
+                                            }
+                                            else // Tự lấy
+                                            {
+                                                <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangThue" class="btn btn-sm btn-primary fw-bold text-white" onclick="return confirm('Khách đã đến lấy máy tại cửa hàng?');">Khách đã nhận</button>
+                                            }
                                         }
                                         else if (item.Status == TechShare.Enums.RentalStatus.DangGiao)
                                         {
-                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangThue" class="btn btn-sm btn-primary fw-bold text-white">Khách đã nhận</button>
+                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangThue" class="btn btn-sm btn-primary fw-bold text-white" onclick="return confirm('Xác nhận Shipper đã giao thành công cho khách?');">Đã giao tới tay khách</button>
                                         }
-                                        else if (item.Status == TechShare.Enums.RentalStatus.DangThue || item.Status == TechShare.Enums.RentalStatus.ChoTra)
+                                        else if (item.Status == TechShare.Enums.RentalStatus.DangThue || item.Status == TechShare.Enums.RentalStatus.ChoTra || item.Status == TechShare.Enums.RentalStatus.TranhChap)
                                         {
                                             <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.HoanTat" class="btn btn-sm btn-dark fw-bold">Xác nhận Trả (Hoàn Tất)</button>
                                         }

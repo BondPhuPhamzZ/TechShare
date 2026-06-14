@@ -39,7 +39,34 @@
                                     <div class="text-danger fw-bold">@rental.EndDate.ToString("dd/MM/yyyy")</div>
                                 </td>
                                 <td>
-                                    <span class="badge @(GetBadge(rental.Status))">@(GetStatus(rental.Status))</span>
+                                    <!-- Timeline Tiến Độ -->
+                                    <div class="small fw-bold text-muted mb-1">Tiến độ đơn hàng:</div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        @if (rental.Status == TechShare.Enums.RentalStatus.DaHuy)
+                                        {
+                                            <span class="badge bg-danger">Đã Hủy Đơn</span>
+                                        }
+                                        else if (rental.Status == TechShare.Enums.RentalStatus.HoanTat)
+                                        {
+                                            <span class="badge bg-dark">Đã Hoàn Tất</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge @(rental.Status >= TechShare.Enums.RentalStatus.ChoDuyet ? "bg-primary" : "bg-secondary text-muted") me-1">Chờ Duyệt</span>
+                                            <i class="bi bi-chevron-right text-muted small"></i>
+                                            <span class="badge @(rental.Status >= TechShare.Enums.RentalStatus.DaDuyet ? "bg-primary" : "bg-secondary text-muted") mx-1">Đã Duyệt</span>
+                                            
+                                            @if (rental.DeliveryMethod == TechShare.Enums.DeliveryMethod.GiaoTanNoi)
+                                            {
+                                                <i class="bi bi-chevron-right text-muted small"></i>
+                                                <span class="badge @(rental.Status >= TechShare.Enums.RentalStatus.DangGiao ? "bg-info text-dark" : "bg-secondary text-muted") mx-1">Đang Giao</span>
+                                            }
+
+                                            <i class="bi bi-chevron-right text-muted small"></i>
+                                            <span class="badge @(rental.Status == TechShare.Enums.RentalStatus.DangThue ? "bg-success" : "bg-secondary text-muted") ms-1">Đang Thuê</span>
+                                        }
+                                    </div>
+                                    <span class="badge @(GetBadge(rental.Status)) mt-1">Trạng thái hiện tại: @(GetStatus(rental.Status))</span>
                                 </td>
                                 <td class="text-end">
                                     @if (rental.Status == TechShare.Enums.RentalStatus.DangThue)
@@ -56,7 +83,7 @@
                                         }
                                         <form asp-controller="Order" asp-action="ReturnDevice" method="post" class="d-inline ms-1">
                                             <input type="hidden" name="id" value="@rental.Id" />
-                                            <button type="submit" class="btn btn-sm btn-warning mb-1" onclick="return confirm('Xác nhận trả máy?')">Trả Máy</button>
+                                            <button type="submit" class="btn btn-sm btn-warning mb-1" onclick="return confirm('CẢNH BÁO: Trả máy sớm hơn thời hạn vẫn sẽ bị tính nguyên phí thuê. Bạn có chắc chắn muốn báo trả máy?')">Trả Máy (Sớm)</button>
                                         </form>
                                     }
                                     else if (rental.Status == TechShare.Enums.RentalStatus.HoanTat)
