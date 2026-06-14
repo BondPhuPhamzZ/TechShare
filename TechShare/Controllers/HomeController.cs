@@ -20,7 +20,9 @@ namespace TechShare.Controllers
         public async Task<IActionResult> Index()
         {
             var devices = await _context.Devices
-                .Include(d => d.Category) 
+                .Include(d => d.Category)
+                .Include(d => d.Rentals)
+                    .ThenInclude(r => r.Review)
                 .Where(d => d.Status == DeviceStatus.SanSang && d.StockQuantity > 0)
                 .OrderByDescending(d => d.Id)
                 .Take(6)

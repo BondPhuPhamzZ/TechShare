@@ -34,19 +34,20 @@ namespace TechShare.Controllers
 
             viewModel.ActiveRentals = await _context.Rentals
                 .Include(r => r.Device)
-                .Where(r => r.RenterId == userId && (r.Status == RentalStatus.DangThue || r.Status == RentalStatus.DangGiao || r.Status == RentalStatus.TranhChap))
-                .OrderByDescending(r => r.Id)
-                .ToListAsync();
-
-            viewModel.PendingRentals = await _context.Rentals
-                .Include(r => r.Device)
-                .Where(r => r.RenterId == userId && r.Status == RentalStatus.ChoDuyet)
+                .Where(r => r.RenterId == userId && (
+                    r.Status == RentalStatus.ChoDuyet || 
+                    r.Status == RentalStatus.DaDuyet || 
+                    r.Status == RentalStatus.DangGiao || 
+                    r.Status == RentalStatus.DangThue || 
+                    r.Status == RentalStatus.TranhChap ||
+                    r.Status == RentalStatus.ChoTra
+                ))
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
 
             viewModel.CompletedRentals = await _context.Rentals
                 .Include(r => r.Device)
-                .Where(r => r.RenterId == userId && (r.Status == RentalStatus.HoanTat || r.Status == RentalStatus.DaHuy || r.Status == RentalStatus.ChoTra))
+                .Where(r => r.RenterId == userId && (r.Status == RentalStatus.HoanTat || r.Status == RentalStatus.DaHuy))
                 .OrderByDescending(r => r.Id)
                 .ToListAsync();
 
