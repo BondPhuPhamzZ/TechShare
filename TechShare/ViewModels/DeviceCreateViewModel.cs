@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace TechShare.ViewModels
@@ -23,7 +23,6 @@ namespace TechShare.ViewModels
         public int StockQuantity { get; set; }
 
 
-        [Required(ErrorMessage = "Vui lòng chọn ảnh thiết bị")]
-        public IFormFile ImageFile { get; set; } = null!;
+        public IFormFile? ImageFile { get; set; }
     }
 }

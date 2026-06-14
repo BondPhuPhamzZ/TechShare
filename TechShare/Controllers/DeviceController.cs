@@ -88,6 +88,11 @@ namespace TechShare.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DeviceCreateViewModel model)
         {
+            if (model.ImageFile == null)
+            {
+                ModelState.AddModelError("ImageFile", "Vui lòng chọn ảnh thiết bị");
+            }
+
             if (ModelState.IsValid)
             {
                 string uniqueFileName = "";
