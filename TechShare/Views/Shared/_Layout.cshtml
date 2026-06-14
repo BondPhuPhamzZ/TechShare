@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TechShare.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header class="sticky-top">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -69,13 +69,13 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container flex-grow-1">
         <main role="main" class="pb-5 mb-5">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted fixed-bottom bg-white pt-3 pb-3 shadow">
+    <footer class="border-top footer text-muted bg-white pt-3 pb-3 shadow mt-auto">
         <div class="container text-center fw-bold">
             &copy; 2026 - TechShare B2C - Cửa Hàng Cho Thuê Thiết Bị Công Nghệ
         </div>
