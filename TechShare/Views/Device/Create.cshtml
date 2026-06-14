@@ -1,4 +1,4 @@
-﻿@model TechShare.ViewModels.DeviceCreateViewModel
+@model TechShare.ViewModels.DeviceCreateViewModel
 @{
     ViewData["Title"] = "Đăng Bài Mới";
 }
@@ -61,7 +61,7 @@
 
                         @* Btn *@
                         <div class="d-flex justify-content-end">
-                            <a asp-controller="Profile" asp-action = "Index" class="btn btn-secondary me-2">Hủy</a>
+                            <a asp-controller="Admin" asp-action="Devices" class="btn btn-secondary me-2">Hủy</a>
                             <button type="submit" class="btn btn-primary fw-bold px-4">Đăng Bài Ngay</button>
                         </div>
                     </form>

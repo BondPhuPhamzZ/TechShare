@@ -19,17 +19,19 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-success text-white shadow-sm border-0 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">Đơn cho thuê</h6>
-                        <h3 class="fw-bold mb-0">@ViewBag.TotalOrders</h3>
+        <a asp-action="Orders" class="text-decoration-none">
+            <div class="card bg-success text-white shadow-sm border-0 h-100 position-relative hover-shadow transition-all">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Đơn cho thuê</h6>
+                            <h3 class="fw-bold mb-0">@ViewBag.TotalOrders</h3>
+                        </div>
+                        <i class="bi bi-cart-check fs-1 opacity-50"></i>
                     </div>
-                    <i class="bi bi-cart-check fs-1 opacity-50"></i>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3">
         <div class="card bg-info text-white shadow-sm border-0 h-100">
@@ -59,58 +61,3 @@
     </div>
 </div>
 
-<div class="card shadow-sm border-0">
-    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-bell-fill text-danger me-2"></i>Đơn hàng cần xử lý</h5>
-        <a asp-action="Orders" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Mã Đơn</th>
-                        <th>Khách Hàng</th>
-                        <th>Thiết Bị</th>
-                        <th>Ngày Thuê</th>
-                        <th>Trạng Thái</th>
-                        <th class="text-end">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td><span class="badge bg-secondary">#@item.Id</span></td>
-                                <td>@item.Renter.FullName</td>
-                                <td>@item.Device.Name</td>
-                                <td>@item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")</td>
-                                <td>
-                                    @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
-                                    {
-                                        <span class="badge bg-warning text-dark">Chờ Duyệt</span>
-                                    }
-                                    else if (item.DepositStatus == TechShare.Enums.DepositStatus.DaThanhToan && item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
-                                    {
-                                        <span class="badge bg-info text-dark">Đã Đặt Cọc</span>
-                                    }
-                                </td>
-                                <td class="text-end">
-                                    <a asp-action="Orders" class="btn btn-sm btn-primary">Xử lý ngay</a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">Tuyệt vời! Không có đơn hàng nào tồn đọng cần xử lý.</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>

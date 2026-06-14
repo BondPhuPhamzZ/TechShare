@@ -130,7 +130,7 @@ namespace TechShare.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Đăng bài thành công!";
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Devices", "Admin");
             }
 
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");

@@ -90,5 +90,47 @@ namespace TechShare.Controllers
                 .ToListAsync();
             return View(reviews);
         }
+        // Khóa / Mở khóa tài khoản
+        [HttpPost]
+        public async Task<IActionResult> ToggleUserLock(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Role == "User");
+            if (user != null)
+            {
+                user.IsLocked = !user.IsLocked;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = user.IsLocked ? $"Đã KHÓA tài khoản {user.FullName}." : $"Đã MỞ KHÓA tài khoản {user.FullName}.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy khách hàng.";
+            }
+            return RedirectToAction(nameof(Users));
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateOrderStatus(int id, Enums.RentalStatus newStatus)
+        {
+            var rental = await _context.Rentals
+                .Include(r => r.Device)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (rental == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
+                return RedirectToAction(nameof(Orders));
+            }
+
+            // Nếu hủy đơn (Từ chối) -> Trả lại số lượng máy vào kho
+            if (newStatus == Enums.RentalStatus.DaHuy && rental.Status != Enums.RentalStatus.DaHuy)
+            {
+                rental.Device.StockQuantity += rental.Quantity;
+            }
+
+            rental.Status = newStatus;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã cập nhật trạng thái đơn #{rental.Id} thành công!";
+            return RedirectToAction(nameof(Orders));
+        }
     }
 }

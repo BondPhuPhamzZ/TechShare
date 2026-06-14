@@ -44,14 +44,17 @@
                                     }
                                 </td>
                                 <td class="text-end">
-                                    @if (item.IsLocked)
-                                    {
-                                        <button class="btn btn-sm btn-outline-success"><i class="bi bi-unlock"></i> Mở Khóa</button>
-                                    }
-                                    else
-                                    {
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-lock"></i> Khóa TK</button>
-                                    }
+                                    <form asp-action="ToggleUserLock" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        @if (item.IsLocked)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-success"><i class="bi bi-unlock"></i> Mở Khóa</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-lock"></i> Khóa TK</button>
+                                        }
+                                    </form>
                                 </td>
                             </tr>
                         }

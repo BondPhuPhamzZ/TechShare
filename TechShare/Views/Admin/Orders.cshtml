@@ -69,26 +69,27 @@
                                     }
                                 </td>
                                 <td class="text-end">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            Cập nhật
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
-                                            {
-                                                <li><a class="dropdown-item text-success" href="#">Duyệt Đơn</a></li>
-                                                <li><a class="dropdown-item text-danger" href="#">Từ Chối (Hoàn Cọc)</a></li>
-                                            }
-                                            @if (item.Status == TechShare.Enums.RentalStatus.DaDuyet)
-                                            {
-                                                <li><a class="dropdown-item text-primary" href="#">Xác nhận Giao Máy</a></li>
-                                            }
-                                            @if (item.Status == TechShare.Enums.RentalStatus.DangThue)
-                                            {
-                                                <li><a class="dropdown-item text-dark" href="#">Xác nhận Trả Máy (Hoàn Tất)</a></li>
-                                            }
-                                        </ul>
-                                    </div>
+                                    <form asp-action="UpdateOrderStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet)
+                                        {
+                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DaDuyet" class="btn btn-sm btn-success fw-bold me-1">Duyệt Đơn</button>
+                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DaHuy" class="btn btn-sm btn-outline-danger fw-bold" onclick="return confirm('Bạn có chắc chắn muốn Từ chối đơn này?');">Từ Chối</button>
+                                        }
+                                        else if (item.Status == TechShare.Enums.RentalStatus.DaDuyet)
+                                        {
+                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangGiao" class="btn btn-sm btn-info fw-bold text-dark me-1">Giao Máy (Shipper)</button>
+                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangThue" class="btn btn-sm btn-primary fw-bold text-white">Khách đã nhận</button>
+                                        }
+                                        else if (item.Status == TechShare.Enums.RentalStatus.DangGiao)
+                                        {
+                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.DangThue" class="btn btn-sm btn-primary fw-bold text-white">Khách đã nhận</button>
+                                        }
+                                        else if (item.Status == TechShare.Enums.RentalStatus.DangThue || item.Status == TechShare.Enums.RentalStatus.ChoTra)
+                                        {
+                                            <button type="submit" name="newStatus" value="@TechShare.Enums.RentalStatus.HoanTat" class="btn btn-sm btn-dark fw-bold">Xác nhận Trả (Hoàn Tất)</button>
+                                        }
+                                    </form>
                                 </td>
                             </tr>
                         }
