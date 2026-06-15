@@ -127,8 +127,9 @@ namespace TechShare.Controllers
                 rental.Device.StockQuantity += rental.Quantity;
             }
 
-            // Ghi nhận thời điểm Shop giao máy thành công cho khách (bắt đầu tính 2h báo lỗi)
-            if (newStatus == Enums.RentalStatus.DangThue && rental.Status == Enums.RentalStatus.DangGiao)
+            // Ghi nhận thời điểm Shop giao máy thành công HOẶC khách tự đến lấy thành công (bắt đầu tính 2h báo lỗi)
+            if (newStatus == Enums.RentalStatus.DangThue && 
+               (rental.Status == Enums.RentalStatus.DangGiao || rental.Status == Enums.RentalStatus.DaDuyet))
             {
                 rental.ShipTime = DateTime.Now;
             }
