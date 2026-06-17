@@ -1,20 +1,20 @@
 @model TechShare.Models.Device
 
 <div class="col">
-    <div class="card h-100 shadow-sm border-0 bg-white device-card-hover position-relative">
+    <div class="card h-100 shadow-sm border-0 bg-white device-card-hover position-relative rounded-4 overflow-hidden">
         <!-- Ảnh thiết bị -->
-        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="height: 220px; object-fit: contain; background-color: #f8f9fa; padding: 10px;" />
+        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="height: 220px; object-fit: contain; background-color: #f8f9fa; padding: 15px;" />
         
-        <div class="card-body d-flex flex-column">
-            <h5 class="card-title fw-bold text-truncate mb-2" title="@Model.Name">
-                <a asp-controller="Device" asp-action="Detail" asp-route-id="@Model.Id" class="stretched-link text-decoration-none text-dark">
+        <div class="card-body d-flex flex-column p-4">
+            <h5 class="card-title fw-bold text-truncate mb-3" title="@Model.Name">
+                <a asp-controller="Device" asp-action="Detail" asp-route-id="@Model.Id" class="stretched-link text-decoration-none text-dark" style="font-size: 1.1rem;">
                     @Model.Name
                 </a>
             </h5>
             
             <div class="mt-auto">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="text-danger fw-bold fs-6">@Model.PricePerDay.ToString("N0") đ/Ngày</span>
+                <div class="mb-3">
+                    <span class="text-danger fw-bold fs-5">@Model.PricePerDay.ToString("N0")đ <small class="text-muted fw-normal fs-6">/ ngày</small></span>
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-center">
@@ -24,9 +24,17 @@
                             if (reviews.Any())
                             {
                                 var avgRating = reviews.Average(r => r.Rating);
-                                <span class="text-warning fw-bold">⭐ @avgRating.ToString("0.0")</span> <span class="text-muted" style="font-size: 0.8rem;">(@reviews.Count)</span>
+                                <span class="text-warning fs-6">
+                                    <i class="bi bi-star-fill"></i> @avgRating.ToString("0.0")
+                                </span> 
+                                <span class="text-muted ms-1">(@reviews.Count)</span>
                             }
                         }
+                    </div>
+                    <div>
+                        <a href="#" class="text-primary text-decoration-none" style="position: relative; z-index: 2;" title="Thêm vào yêu thích">
+                            <i class="bi bi-heart fs-5"></i>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -3,7 +3,7 @@
     ViewData["Title"] = "Danh Mục Thiết Bị";
 }
 
-<div class="bg-white py-3 shadow-sm mb-4 sticky-top" style="top: 70px; z-index: 1020;">
+<div class="py-3 mb-4 sticky-top" style="top: 70px; z-index: 1020;">
     <div class="container">
         <form asp-controller="Device" asp-action="Catalog" method="get" class="d-flex justify-content-center">
             <input type="text" name="q" value="@ViewData["SearchQuery"]" class="form-control form-control-lg w-50 me-2" placeholder="Tìm kiếm máy ảnh, laptop, cáp sạc..." />
