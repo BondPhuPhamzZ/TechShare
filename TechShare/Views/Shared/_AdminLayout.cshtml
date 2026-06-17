@@ -34,8 +34,8 @@
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0">
-            <!-- Desktop Sidebar (Sticky) -->
-            <div class="col-md-2 sidebar d-none d-md-flex flex-column position-sticky top-0 vh-100 shadow align-self-start">
+            <!-- Desktop Sidebar (Fixed) -->
+            <div class="col-md-2 sidebar d-none d-md-flex flex-column shadow p-0" style="position: fixed; top: 0; bottom: 0; left: 0; z-index: 1040; height: 100vh; overflow-y: auto;">
                 <div class="text-center p-3 text-white border-bottom border-secondary">
                     <h4 class="fw-bold mb-0 text-primary">TECHSHARE</h4>
                     <small>Admin Dashboard</small>
@@ -75,7 +75,7 @@
             </div>
 
             <!-- Main Content -->
-            <div class="col-md-10">
+            <div class="col-md-10 offset-md-2">
                 <!-- Topbar -->
                 <div class="bg-white p-3 shadow-sm d-flex justify-content-between align-items-center mb-4 sticky-top z-1">
                     <div class="d-flex align-items-center">
