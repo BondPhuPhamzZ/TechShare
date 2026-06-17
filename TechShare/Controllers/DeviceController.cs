@@ -44,7 +44,7 @@ namespace TechShare.Controllers
             return View(device);
         }
 
-        public async Task<IActionResult> Catalog(string q, int? categoryId)
+        public async Task<IActionResult> Catalog(string q, int? categoryId, int page = 1)
         {
             var query = _context.Devices
                 .Include(d => d.Category) 
@@ -62,13 +62,22 @@ namespace TechShare.Controllers
                 query = query.Where(d => d.CategoryId == categoryId.Value);
             }
 
+            int pageSize = 8;
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
             var devices = await query
                 .OrderByDescending(d => d.Id) 
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             ViewData["SearchQuery"] = q;
             ViewData["CategoryId"] = categoryId;
             ViewData["Categories"] = await _context.Categories.ToListAsync();
+            
+            ViewData["CurrentPage"] = page;
+            ViewData["TotalPages"] = totalPages;
 
             return View(devices);
         }

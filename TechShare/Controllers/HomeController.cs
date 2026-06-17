@@ -25,7 +25,7 @@ namespace TechShare.Controllers
                     .ThenInclude(r => r.Review)
                 .Where(d => d.Status == DeviceStatus.SanSang && d.StockQuantity > 0)
                 .OrderByDescending(d => d.Id)
-                .Take(6)
+                .Take(4)
                 .ToListAsync();
 
             return View(devices);

@@ -20,7 +20,7 @@
         <a asp-controller="Device" asp-action="Catalog" class="text-decoration-none">Xem tất cả <i class="bi bi-arrow-right"></i></a>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
         @if (Model == null || !Model.Any())
         {
             <div class="col-12">
@@ -34,5 +34,10 @@
                 <partial name="_DeviceCard" model="item" />
             }
         }
+    </div>
+    </div>
+    
+    <div class="text-center mt-5">
+        <a asp-controller="Device" asp-action="Catalog" class="btn btn-outline-primary btn-lg px-5 fw-bold rounded-pill shadow-sm">Xem thêm tất cả thiết bị <i class="bi bi-arrow-right ms-2"></i></a>
     </div>
 </div>
