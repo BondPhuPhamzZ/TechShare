@@ -67,45 +67,6 @@ namespace TechShare.Data
                 }
             );
             context.SaveChanges();
-
-            // --- Thêm Reviews mẫu ---
-            var device = context.Devices.FirstOrDefault();
-            var user = context.Users.FirstOrDefault(u => u.Role == "User");
-            if (device != null && user != null)
-            {
-                // Tạo 3 đơn thuê hoàn tất để có review
-                for (int i = 1; i <= 3; i++)
-                {
-                    var rental = new Rental
-                    {
-                        RenterId = user.Id,
-                        DeviceId = device.Id,
-                        Quantity = 1,
-                        StartDate = DateTime.Now.AddDays(-10 - i),
-                        EndDate = DateTime.Now.AddDays(-8 - i),
-                        Status = RentalStatus.HoanTat,
-                        DeliveryMethod = DeliveryMethod.TuLay,
-                        TotalPrice = device.PricePerDay * 2,
-                        ShipTime = DateTime.Now.AddDays(-10 - i),
-                        IsReviewed = true
-                    };
-                    context.Rentals.Add(rental);
-                    context.SaveChanges(); // Để lấy RentalId
-                    
-                    var review = new Review
-                    {
-                        RentalId = rental.Id,
-                        ReviewerId = user.Id,
-                        Rating = (i % 2 == 0) ? 5 : 4,
-                        Comment = $"Thiết bị rất tuyệt vời, dùng ổn định, chất lượng xứng đáng. Đây là bình luận mẫu số {i}.",
-                        CreatedAt = DateTime.Now.AddDays(-7 - i)
-                    };
-                    context.Reviews.Add(review);
-                }
-                context.SaveChanges();
-            }
-
-            // Removed hardcoded device add to avoid duplication, handled by dynamic add above.
         }
     }
 }
