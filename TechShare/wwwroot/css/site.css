@@ -21,20 +21,21 @@ body {
   margin-bottom: 60px;
 }
 
-/* Custom UI/UX: Override Bootstrap Primary Color to Indigo */
+/* Custom UI/UX: Override Bootstrap Primary Color to Teal (Ngọc bích trầm) */
 :root {
-  --bs-primary: #4f46e5;
-  --bs-primary-rgb: 79, 70, 229;
+  --bs-primary: #0d9488;
+  --bs-primary-rgb: 13, 148, 136;
 }
 
 .btn-primary {
   background-color: var(--bs-primary) !important;
   border-color: var(--bs-primary) !important;
+  color: #ffffff !important;
 }
 
 .btn-primary:hover {
-  background-color: #4338ca !important;
-  border-color: #4338ca !important;
+  background-color: #0f766e !important;
+  border-color: #0f766e !important;
 }
 
 .text-primary {
@@ -43,6 +44,15 @@ body {
 
 .bg-primary {
   background-color: var(--bs-primary) !important;
+}
+
+/* Card hover effect */
+.device-card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.device-card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
 }
 
 /* Admin Sidebar active styling */
