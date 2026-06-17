@@ -30,7 +30,7 @@
     }
     .timeline-progress {
         height: 100%;
-        background-color: #4f46e5; /* primary color */
+        background-color: #4f46e5; 
         transition: width 0.5s ease;
     }
 </style>
@@ -80,9 +80,11 @@ else
                         @if (statusLevel >= 0 && statusLevel <= 3)
                         {
                             <div class="position-relative mt-2 mb-2">
+
                                 <div class="timeline-bar">
                                     <div class="timeline-progress" style="width: @(progress)%"></div>
                                 </div>
+
                                 <div class="d-flex justify-content-between position-relative z-index-2">
                                     <div class="timeline-step">
                                         <div class="timeline-icon @(statusLevel >= 0 ? "bg-primary text-white shadow-sm" : "bg-light text-muted border")">
@@ -90,24 +92,28 @@ else
                                         </div>
                                         <div class="small @(statusLevel >= 0 ? "fw-bold text-primary" : "text-muted")">Chờ Duyệt</div>
                                     </div>
+
                                     <div class="timeline-step">
                                         <div class="timeline-icon @(statusLevel >= 1 ? "bg-primary text-white shadow-sm" : "bg-light text-muted border")">
                                             <i class="bi bi-check-circle"></i>
                                         </div>
                                         <div class="small @(statusLevel >= 1 ? "fw-bold text-primary" : "text-muted")">Đã Duyệt</div>
                                     </div>
+
                                     <div class="timeline-step">
                                         <div class="timeline-icon @(statusLevel >= 2 ? "bg-primary text-white shadow-sm" : "bg-light text-muted border")">
                                             <i class="bi bi-truck"></i>
                                         </div>
                                         <div class="small @(statusLevel >= 2 ? "fw-bold text-primary" : "text-muted")">Đang Giao</div>
                                     </div>
+
                                     <div class="timeline-step">
                                         <div class="timeline-icon @(statusLevel >= 3 ? "bg-primary text-white shadow-sm" : "bg-light text-muted border")">
                                             <i class="bi bi-box-seam"></i>
                                         </div>
                                         <div class="small @(statusLevel >= 3 ? "fw-bold text-primary" : "text-muted")">Đang Thuê</div>
                                     </div>
+
                                 </div>
                             </div>
                         }
