@@ -3,16 +3,16 @@
     ViewData["Title"] = "Danh Mục Thiết Bị";
 }
 
-<div class="sticky-top bg-white py-3 shadow-sm z-1 mb-4">
+<div class="bg-white py-3 shadow-sm mb-4">
     <div class="container">
         <form asp-controller="Device" asp-action="Catalog" method="get" class="d-flex justify-content-center">
-            <input type="text" name="q" value="@ViewData["SearchQuery"]" class="form-control form-control-lg w-50 me-2 border-primary" placeholder="Tìm kiếm máy ảnh, laptop, cáp sạc..." />
+            <input type="text" name="q" value="@ViewData["SearchQuery"]" class="form-control form-control-lg w-50 me-2" placeholder="Tìm kiếm máy ảnh, laptop, cáp sạc..." />
             
             @{
                 var categories = ViewData["Categories"] as List<TechShare.Models.Category> ?? new List<TechShare.Models.Category>();
                 int? currentCatId = ViewData["CategoryId"] as int?;
             }
-            <select name="categoryId" class="form-select form-select-lg w-25 me-2 border-primary">
+            <select name="categoryId" class="form-select form-select-lg w-25 me-2">
                 <option value="">Tất cả danh mục</option>
                 @foreach (var cat in categories)
                 {
