@@ -30,10 +30,16 @@ namespace TechShare.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.PasswordHash == model.Password);
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
                 
-                if (user != null)
+                if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
                 {
+                    if (user.IsLocked)
+                    {
+                        ModelState.AddModelError(string.Empty, "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ hỗ trợ.");
+                        return View(model);
+                    }
+
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -84,8 +90,9 @@ namespace TechShare.Controllers
                     Email = model.Email,
                     Username = model.Email, 
                     PhoneNumber = model.PhoneNumber,
-                    PasswordHash = model.Password,
-                    Role = "User"
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                    Role = "User",
+                    IsVerified = false
                 };
 
                 _context.Users.Add(newUser);

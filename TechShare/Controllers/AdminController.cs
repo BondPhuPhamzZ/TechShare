@@ -90,7 +90,6 @@ namespace TechShare.Controllers
                 .ToListAsync();
             return View(reviews);
         }
-        // Khóa / Mở khóa tài khoản
         [HttpPost]
         public async Task<IActionResult> ToggleUserLock(int id)
         {
@@ -107,6 +106,25 @@ namespace TechShare.Controllers
             }
             return RedirectToAction(nameof(Users));
         }
+
+        // Duyệt CCCD
+        [HttpPost]
+        public async Task<IActionResult> ApproveUser(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Role == "User");
+            if (user != null)
+            {
+                user.IsVerified = true;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Đã duyệt CCCD cho khách hàng {user.FullName}.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy khách hàng.";
+            }
+            return RedirectToAction(nameof(Users));
+        }
+
         [HttpPost]
         public async Task<IActionResult> UpdateOrderStatus(int id, Enums.RentalStatus newStatus)
         {

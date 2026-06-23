@@ -35,6 +35,12 @@ namespace TechShare.Models
         // Khóa tài khoản
         public bool IsLocked { get; set; } = false;
 
+        // Xác minh danh tính (eKYC)
+        public bool IsVerified { get; set; } = false;
+        
+        [MaxLength(500)]
+        public string? CccdImageUrl { get; set; }
+
         public ICollection<Rental> Rentals { get; set; } = new List<Rental>();
     }
 }

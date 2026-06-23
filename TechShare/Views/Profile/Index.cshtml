@@ -8,7 +8,15 @@
     <div class="row justify-content-center">
         <div class="col-md-5 mb-4">
             <div class="card shadow-sm border-0 text-center p-4">
-                <img src="https://ui-avatars.com/api/?name=@Model.UserInfo.FullName&background=random&size=150" class="rounded-circle mx-auto mb-3 shadow" alt="Avatar" style="width: 150px;">
+                <div class="position-relative d-inline-block mx-auto mb-3">
+                    <img src="https://ui-avatars.com/api/?name=@Model.UserInfo.FullName&background=random&size=150" class="rounded-circle shadow" alt="Avatar" style="width: 150px; height: 150px; object-fit: cover;">
+                    @if (Model.UserInfo.IsVerified)
+                    {
+                        <span class="position-absolute bottom-0 end-0 p-2 bg-success border border-light rounded-circle" title="Đã xác minh" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-check-lg text-white"></i>
+                        </span>
+                    }
+                </div>
                 <h4 class="fw-bold mb-1">
                     @Model.UserInfo.FullName
                 </h4>
@@ -34,6 +42,60 @@
             
             <div class="alert alert-info mt-4 text-center">
                 <i class="bi bi-info-circle"></i> Để theo dõi các thiết bị đang thuê, vui lòng vào <strong>Đơn Đi Thuê</strong>.
+            </div>
+        </div>
+
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 p-4 h-100">
+                <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-shield-check me-2"></i>Xác minh danh tính (eKYC)</h5>
+                
+                @if (Model.UserInfo.IsVerified)
+                {
+                    <div class="alert alert-success d-flex align-items-center mb-4">
+                        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                        <div>
+                            <strong>Tài khoản đã được xác minh</strong><br>
+                            Bạn đã có thể thực hiện đặt thuê thiết bị trên hệ thống.
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning d-flex align-items-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-warning"></i>
+                        <div>
+                            <strong>Tài khoản chưa xác minh</strong><br>
+                            Vui lòng tải lên ảnh CCCD (Mặt trước) để được cấp quyền thuê máy.
+                        </div>
+                    </div>
+                }
+
+                <div class="text-center mb-4 bg-light rounded p-3 border">
+                    @if (!string.IsNullOrEmpty(Model.UserInfo.CccdImageUrl))
+                    {
+                        <img src="@Model.UserInfo.CccdImageUrl" class="img-fluid rounded shadow-sm" alt="CCCD" style="max-height: 200px; object-fit: contain;">
+                        @if (!Model.UserInfo.IsVerified)
+                        {
+                            <p class="text-primary mt-2 mb-0 fw-bold small"><i class="bi bi-clock-history me-1"></i>Đang chờ Cửa hàng duyệt...</p>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-muted py-4">
+                            <i class="bi bi-image fs-1 opacity-50"></i>
+                            <p class="mt-2 mb-0">Chưa có ảnh chụp CCCD</p>
+                        </div>
+                    }
+                </div>
+
+                <form asp-action="UploadCccd" method="post" enctype="multipart/form-data" class="mt-auto">
+                    <div class="mb-3">
+                        <label for="cccdImage" class="form-label fw-bold">Tải lên ảnh CCCD mới:</label>
+                        <input class="form-control" type="file" id="cccdImage" name="cccdImage" accept="image/jpeg, image/png, image/jpg" required>
+                        <div class="form-text small text-muted">Chỉ hỗ trợ định dạng JPG, PNG. Dung lượng < 5MB.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold"><i class="bi bi-cloud-arrow-up me-2"></i>Tải lên & Chờ duyệt</button>
+                </form>
             </div>
         </div>
     </div>

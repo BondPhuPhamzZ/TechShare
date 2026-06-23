@@ -18,6 +18,8 @@
                         <th>Email</th>
                         <th>Số Điện Thoại</th>
                         <th>Ngày Đăng Ký</th>
+                        <th>CCCD</th>
+                        <th>Xác Minh (eKYC)</th>
                         <th>Trạng Thái</th>
                         <th class="text-end">Thao tác</th>
                     </tr>
@@ -33,6 +35,33 @@
                                 <td>@item.Email</td>
                                 <td>@item.PhoneNumber</td>
                                 <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.CccdImageUrl))
+                                    {
+                                        <a href="@item.CccdImageUrl" target="_blank" class="text-primary"><i class="bi bi-image"></i> Xem ảnh</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Chưa có</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.IsVerified)
+                                    {
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Đã duyệt</span>
+                                    }
+                                    else if (!string.IsNullOrEmpty(item.CccdImageUrl))
+                                    {
+                                        <form asp-action="ApproveUser" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-primary py-0">Duyệt ngay</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Chờ upload</span>
+                                    }
+                                </td>
                                 <td>
                                     @if (item.IsLocked)
                                     {
@@ -62,7 +91,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center py-4 text-muted">Chưa có khách hàng nào.</td>
+                            <td colspan="9" class="text-center py-4 text-muted">Chưa có khách hàng nào.</td>
                         </tr>
                     }
                 </tbody>

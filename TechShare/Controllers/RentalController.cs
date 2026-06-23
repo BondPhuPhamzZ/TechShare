@@ -26,6 +26,13 @@ namespace TechShare.Controllers
         public async Task<IActionResult> Checkout(int deviceId, DateTime startDate, DateTime endDate, int quantity)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null || !user.IsVerified)
+            {
+                TempData["ErrorMessage"] = "Vui lòng xác minh danh tính (CCCD) trong Cài đặt tài khoản để thực hiện thuê thiết bị.";
+                return RedirectToAction("Index", "Profile");
+            }
 
             var device = await _context.Devices
                 .FirstOrDefaultAsync(d => d.Id == deviceId);

@@ -1,6 +1,19 @@
 @model TechShare.Models.Device
+@inject TechShare.Data.TechShareDbContext _context
+@using System.Security.Claims
 @{
     ViewData["Title"] = Model.Name;
+
+    bool isVerified = false;
+    if (User.Identity.IsAuthenticated)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(userIdStr, out int userId))
+        {
+            var user = _context.Users.Find(userId);
+            if (user != null) { isVerified = user.IsVerified; }
+        }
+    }
 }
 
 <div class="container mt-5">
@@ -62,9 +75,26 @@
                         <input type="number" class="form-control" name="quantity" min="1" max="@Model.StockQuantity" value="1" required>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow">
-                        TIẾN HÀNH THUÊ VÀ ĐẶT CỌC
-                    </button>
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <a href="/Auth/Login" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow">ĐĂNG NHẬP ĐỂ THUÊ THIẾT BỊ</a>
+                    }
+                    else if (!isVerified)
+                    {
+                        <div class="alert alert-warning border-warning shadow-sm">
+                            <strong><i class="bi bi-shield-lock me-2"></i>Yêu cầu xác minh danh tính!</strong><br>
+                            Bạn cần tải lên ảnh CCCD tại trang <a href="/Profile/Index" class="alert-link">Hồ sơ cá nhân</a> để có thể đặt thuê.
+                        </div>
+                        <button type="button" class="btn btn-secondary w-100 py-3 fw-bold fs-5 shadow" disabled>
+                            TÀI KHOẢN CHƯA XÁC MINH
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow">
+                            TIẾN HÀNH THUÊ VÀ ĐẶT CỌC
+                        </button>
+                    }
                 </form>
 
             </div>

@@ -94,16 +94,54 @@ namespace TechShare.Controllers
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return NotFound();
 
-            if (user.PasswordHash != model.OldPassword)
+            if (!BCrypt.Net.BCrypt.Verify(model.OldPassword, user.PasswordHash))
             {
                 ModelState.AddModelError("OldPassword", "Mật khẩu cũ không chính xác.");
                 return View(model);
             }
 
-            user.PasswordHash = model.NewPassword;
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadCccd(Microsoft.AspNetCore.Http.IFormFile cccdImage)
+        {
+            if (cccdImage == null || cccdImage.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn ảnh hợp lệ.";
+                return RedirectToAction("Index");
+            }
+
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) return RedirectToAction("Login", "Auth");
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            string uploadsFolder = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", "cccd");
+            if (!System.IO.Directory.Exists(uploadsFolder))
+            {
+                System.IO.Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = System.Guid.NewGuid().ToString() + "_" + cccdImage.FileName;
+            string filePath = System.IO.Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+            {
+                await cccdImage.CopyToAsync(fileStream);
+            }
+
+            user.CccdImageUrl = "/images/cccd/" + uniqueFileName;
+            user.IsVerified = false; // Đặt về false để Admin duyệt lại nếu đổi ảnh mới
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Tải ảnh CCCD thành công. Vui lòng chờ cửa hàng duyệt.";
             return RedirectToAction("Index");
         }
     }
