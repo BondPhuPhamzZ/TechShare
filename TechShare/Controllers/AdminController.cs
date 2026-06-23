@@ -17,18 +17,17 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        // Bảng điều khiển (Thống kê)
+        // Dashboard thống kê
         public async Task<IActionResult> Index()
         {
-            // Lấy số liệu thống kê
             var totalUsers = await _context.Users.Where(u => u.Role == "User").CountAsync();
             var totalDevices = await _context.Devices.CountAsync();
             var totalOrders = await _context.Rentals.CountAsync();
             
-            // Tính tổng doanh thu từ các đơn hàng đã Hoàn Tất
+            // Tổng doanh thu các đơn hàng đã hoàn tất
             var totalRevenue = await _context.Rentals
                 .Where(r => r.Status == Enums.RentalStatus.HoanTat)
-                .SumAsync(r => r.TotalPrice); // Mặc định là Cửa hàng lấy 100%
+                .SumAsync(r => r.TotalPrice); 
 
             ViewBag.TotalUsers = totalUsers;
             ViewBag.TotalDevices = totalDevices;
@@ -138,14 +137,14 @@ namespace TechShare.Controllers
                 return RedirectToAction(nameof(Orders));
             }
 
-            // Nếu hủy đơn (Từ chối) HOẶC trả máy (Hoàn Tất) -> Trả lại số lượng máy vào kho
+            // Hủy đơn/ Trả máy -> Trả lại số lượng máy vào kho
             if ((newStatus == Enums.RentalStatus.DaHuy && rental.Status != Enums.RentalStatus.DaHuy) ||
                 (newStatus == Enums.RentalStatus.HoanTat && rental.Status != Enums.RentalStatus.HoanTat))
             {
                 rental.Device.StockQuantity += rental.Quantity;
             }
 
-            // Ghi nhận thời điểm Shop giao máy thành công HOẶC khách tự đến lấy thành công (bắt đầu tính 2h báo lỗi)
+            // Ghi nhận thời điểm khách nhận máy (bắt đầu tính 2h)
             if (newStatus == Enums.RentalStatus.DangThue && 
                (rental.Status == Enums.RentalStatus.DangGiao || rental.Status == Enums.RentalStatus.DaDuyet))
             {

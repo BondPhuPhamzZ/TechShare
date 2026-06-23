@@ -107,6 +107,7 @@ namespace TechShare.Controllers
             return RedirectToAction("Index");
         }
 
+        // Xác minh CCCD
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadCccd(Microsoft.AspNetCore.Http.IFormFile cccdImage)
@@ -138,7 +139,7 @@ namespace TechShare.Controllers
             }
 
             user.CccdImageUrl = "/images/cccd/" + uniqueFileName;
-            user.IsVerified = false; // Đặt về false để Admin duyệt lại nếu đổi ảnh mới
+            user.IsVerified = false; 
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Tải ảnh CCCD thành công. Vui lòng chờ cửa hàng duyệt.";
