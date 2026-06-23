@@ -103,7 +103,7 @@ namespace TechShare.Controllers
             {
                 TempData["ErrorMessage"] = "Không tìm thấy khách hàng.";
             }
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction("Users");
         }
 
         // Duyệt CCCD
@@ -121,7 +121,7 @@ namespace TechShare.Controllers
             {
                 TempData["ErrorMessage"] = "Không tìm thấy khách hàng.";
             }
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction("Users");
         }
 
         [HttpPost]
@@ -134,7 +134,7 @@ namespace TechShare.Controllers
             if (rental == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
-                return RedirectToAction(nameof(Orders));
+                return RedirectToAction("Orders");
             }
 
             // Hủy đơn/ Trả máy -> Trả lại số lượng máy vào kho
@@ -155,7 +155,7 @@ namespace TechShare.Controllers
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Đã cập nhật trạng thái đơn #{rental.Id} thành công!";
-            return RedirectToAction(nameof(Orders));
+            return RedirectToAction("Orders");
         }
 
         // Quản lý Danh Mục - Thêm
@@ -169,7 +169,7 @@ namespace TechShare.Controllers
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Đã thêm danh mục mới!";
             }
-            return RedirectToAction(nameof(Categories));
+            return RedirectToAction("Categories");
         }
 
         // Quản lý Danh Mục - Sửa
@@ -183,7 +183,7 @@ namespace TechShare.Controllers
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Đã cập nhật tên danh mục!";
             }
-            return RedirectToAction(nameof(Categories));
+            return RedirectToAction("Categories");
         }
 
         // Quản lý Danh Mục - Xóa
@@ -204,7 +204,7 @@ namespace TechShare.Controllers
                     TempData["SuccessMessage"] = "Đã xóa danh mục!";
                 }
             }
-            return RedirectToAction(nameof(Categories));
+            return RedirectToAction("Categories");
         }
     }
 }
