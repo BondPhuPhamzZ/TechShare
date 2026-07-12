@@ -42,22 +42,22 @@ namespace TechShare.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitReview(int rentalId, int rating, string comment)
+        public async Task<IActionResult> SubmitReview(TechShare.ViewModels.ReviewCreateViewModel model)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             
             var rental = await _context.Rentals
                 .Include(r => r.Device)
-                .FirstOrDefaultAsync(r => r.Id == rentalId);
+                .FirstOrDefaultAsync(r => r.Id == model.RentalId);
 
             if (rental == null) 
                 return NotFound();
 
             var review = new Review
             {
-                RentalId = rentalId,
-                Rating = rating,
-                Comment = comment,
+                RentalId = model.RentalId,
+                Rating = model.Rating,
+                Comment = model.Comment,
                 ReviewerId = userId
             };
 

@@ -25,6 +25,9 @@ builder.Services.AddAuthentication("Cookies")
             builder.Services.AddDbContext<TechShareDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Add Custom Services
+            builder.Services.AddScoped<TechShare.Services.IPasswordHasherService, TechShare.Services.PasswordHasherService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -13,10 +13,12 @@ namespace TechShare.Controllers
     public class AuthController : Controller
     {
         private readonly TechShareDbContext _context;
+        private readonly Services.IPasswordHasherService _passwordHasher;
 
-        public AuthController(TechShareDbContext context)
+        public AuthController(TechShareDbContext context, Services.IPasswordHasherService passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         public IActionResult Login()
@@ -32,7 +34,7 @@ namespace TechShare.Controllers
             {
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
                 
-                if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+                if (user != null && _passwordHasher.VerifyPassword(model.Password, user.PasswordHash))
                 {
                     if (user.IsLocked)
                     {
@@ -90,7 +92,7 @@ namespace TechShare.Controllers
                     Email = model.Email,
                     Username = model.Email, 
                     PhoneNumber = model.PhoneNumber,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                    PasswordHash = _passwordHasher.HashPassword(model.Password),
                     Role = "User",
                     IsVerified = false
                 };

@@ -23,7 +23,7 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Checkout(int deviceId, DateTime startDate, DateTime endDate, int quantity)
+        public async Task<IActionResult> Checkout(TechShare.ViewModels.RentalCheckoutViewModel model)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             
@@ -35,82 +35,82 @@ namespace TechShare.Controllers
             }
 
             var device = await _context.Devices
-                .FirstOrDefaultAsync(d => d.Id == deviceId);
+                .FirstOrDefaultAsync(d => d.Id == model.DeviceId);
 
             if (device == null) 
                 return NotFound();
 
             var today = DateTime.Now.Date;
-            if (startDate.Date <= today)
+            if (model.StartDate.Date <= today)
             {
                 TempData["ErrorMessage"] = "Ngày bắt đầu thuê phải từ ngày mai trở đi để Cửa hàng kịp chuẩn bị máy.";
-                return RedirectToAction("Detail", "Device", new { id = deviceId });
+                return RedirectToAction("Detail", "Device", new { id = model.DeviceId });
             }
 
-            if (startDate.Date > today.AddDays(30))
+            if (model.StartDate.Date > today.AddDays(30))
             {
                 TempData["ErrorMessage"] = "Bạn chỉ có thể đặt thuê trước tối đa 30 ngày.";
-                return RedirectToAction("Detail", "Device", new { id = deviceId });
+                return RedirectToAction("Detail", "Device", new { id = model.DeviceId });
             }
 
-            if (endDate.Date < startDate.Date)
+            if (model.EndDate.Date < model.StartDate.Date)
             {
                 TempData["ErrorMessage"] = "Ngày trả máy không được trước Ngày nhận máy.";
-                return RedirectToAction("Detail", "Device", new { id = deviceId });
+                return RedirectToAction("Detail", "Device", new { id = model.DeviceId });
             }
 
-            int rentDays = (endDate - startDate).Days;
+            int rentDays = (model.EndDate - model.StartDate).Days;
             if (rentDays <= 0) 
                 rentDays = 1; 
 
-            decimal totalPrice = rentDays * device.PricePerDay * quantity;
+            decimal totalPrice = rentDays * device.PricePerDay * model.Quantity;
 
             ViewBag.RentDays = rentDays;
             ViewBag.TotalPrice = totalPrice;
-            ViewBag.StartDate = startDate;
-            ViewBag.EndDate = endDate;
-            ViewBag.Quantity = quantity;
+            ViewBag.StartDate = model.StartDate;
+            ViewBag.EndDate = model.EndDate;
+            ViewBag.Quantity = model.Quantity;
 
             return View(device);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmCheckout(int deviceId, DateTime startDate, DateTime endDate, int quantity, string deliveryAddress, DeliveryMethod deliveryMethod)
+        public async Task<IActionResult> ConfirmCheckout(TechShare.ViewModels.RentalCheckoutViewModel model)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var device = await _context.Devices.FindAsync(deviceId);
+            var device = await _context.Devices.FindAsync(model.DeviceId);
             if (device == null) 
                 return NotFound();
 
             var today = DateTime.Now.Date;
-            if (startDate.Date <= today || startDate.Date > today.AddDays(30) || endDate.Date < startDate.Date)
+            if (model.StartDate.Date <= today || model.StartDate.Date > today.AddDays(30) || model.EndDate.Date < model.StartDate.Date)
             {
                 TempData["ErrorMessage"] = "Thông tin ngày thuê không hợp lệ. Vui lòng chọn lại.";
-                return RedirectToAction("Detail", "Device", new { id = deviceId });
+                return RedirectToAction("Detail", "Device", new { id = model.DeviceId });
             }
 
-            int rentDays = (endDate - startDate).Days;
+            int rentDays = (model.EndDate - model.StartDate).Days;
             if (rentDays <= 0) 
                 rentDays = 1;
-            decimal totalPrice = rentDays * device.PricePerDay * quantity;
+            decimal totalPrice = rentDays * device.PricePerDay * model.Quantity;
 
             var rental = new Rental
             {
-                DeviceId = deviceId,
+                DeviceId = model.DeviceId,
                 RenterId = userId, 
-                StartDate = startDate,
-                EndDate = endDate,
-                Quantity = quantity,
-                DeliveryMethod = deliveryMethod,
-                DeliveryAddress = deliveryAddress,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                Quantity = model.Quantity,
+                DeliveryMethod = model.DeliveryMethod,
+                DeliveryAddress = model.DeliveryAddress,
                 TotalPrice = totalPrice,
                 DepositStatus = DepositStatus.DaThanhToan, // Giả lập đã thanh toán cọc qua Momo/VNPay thành công
                 Status = RentalStatus.ChoDuyet // Chờ chủ máy duyệt
             };
 
-            device.StockQuantity -= quantity;
+            device.StockQuantity -= model.Quantity;
 
             _context.Rentals.Add(rental);
             await _context.SaveChangesAsync();
