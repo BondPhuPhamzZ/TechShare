@@ -84,7 +84,6 @@ namespace TechShare.Controllers
 
         // Trang upload thiết bị
         [Authorize(Roles = "Admin")]
-        // GET: Device/Create
         public async Task<IActionResult> Create()
         {
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
