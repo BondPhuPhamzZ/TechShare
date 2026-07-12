@@ -77,7 +77,7 @@
                     
                     @if (!User.Identity.IsAuthenticated)
                     {
-                        <a href="/Auth/Login" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow">ĐĂNG NHẬP ĐỂ THUÊ THIẾT BỊ</a>
+                        <a href="/Auth/Login" class="btn btn-primary w-100 py-2 fw-bold fs-6 shadow-sm">ĐĂNG NHẬP ĐỂ THUÊ THIẾT BỊ</a>
                     }
                     else if (!isVerified)
                     {
@@ -85,13 +85,13 @@
                             <strong><i class="bi bi-shield-lock me-2"></i>Yêu cầu xác minh danh tính!</strong><br>
                             Bạn cần tải lên ảnh CCCD tại trang <a href="/Profile/Index" class="alert-link">Hồ sơ cá nhân</a> để có thể đặt thuê.
                         </div>
-                        <button type="button" class="btn btn-secondary w-100 py-3 fw-bold fs-5 shadow" disabled>
+                        <button type="button" class="btn btn-secondary w-100 py-2 fw-bold fs-6 shadow-sm" disabled>
                             TÀI KHOẢN CHƯA XÁC MINH
                         </button>
                     }
                     else
                     {
-                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow">
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold fs-6 shadow-sm">
                             TIẾN HÀNH THUÊ VÀ ĐẶT CỌC
                         </button>
                     }
@@ -109,7 +109,7 @@
     
     <div class="row mt-5">
         <div class="col-md-12">
-            <h4 class="fw-bold mb-4">⭐ Lịch sử Đánh giá Thiết bị (@allReviews.Count đánh giá)</h4>
+            <h4 class="fw-bold mb-4">Lịch sử Đánh giá Thiết bị (@allReviews.Count đánh giá)</h4>
             
             @if (!allReviews.Any())
             {

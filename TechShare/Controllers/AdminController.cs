@@ -89,6 +89,23 @@ namespace TechShare.Controllers
                 .ToListAsync();
             return View(reviews);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteReview(int id)
+        {
+            var review = await _context.Reviews.FindAsync(id);
+            if (review != null)
+            {
+                _context.Reviews.Remove(review);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Đã xóa đánh giá vi phạm thành công!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy đánh giá.";
+            }
+            return RedirectToAction("Reviews");
+        }
         [HttpPost]
         public async Task<IActionResult> ToggleUserLock(int id)
         {

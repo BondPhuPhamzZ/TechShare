@@ -7,63 +7,35 @@
 <div class="row mb-4 g-4">
     <div class="col-md-3">
         <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 rounded-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase text-muted mb-1 fs-6">Doanh thu</h6>
-                        <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalRevenue.ToString("N0") đ</h3>
-                    </div>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="background-color: rgba(37, 99, 235, 0.1); width: 60px; height: 60px;">
-                        <i class="bi bi-wallet2 text-primary fs-3"></i>
-                    </div>
-                </div>
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
+                <h6 class="text-uppercase text-muted mb-2 fs-6">Doanh thu</h6>
+                <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalRevenue.ToString("N0") đ</h3>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <a asp-action="Orders" class="text-decoration-none">
             <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 position-relative hover-shadow transition-all rounded-3">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase text-muted mb-1 fs-6">Đơn cho thuê</h6>
-                            <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalOrders</h3>
-                        </div>
-                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="background-color: rgba(37, 99, 235, 0.1); width: 60px; height: 60px;">
-                            <i class="bi bi-cart-check text-primary fs-3"></i>
-                        </div>
-                    </div>
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
+                    <h6 class="text-uppercase text-muted mb-2 fs-6">Đơn cho thuê</h6>
+                    <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalOrders</h3>
                 </div>
             </div>
         </a>
     </div>
     <div class="col-md-3">
         <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 rounded-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase text-muted mb-1 fs-6">Tổng thiết bị</h6>
-                        <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalDevices</h3>
-                    </div>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="background-color: rgba(37, 99, 235, 0.1); width: 60px; height: 60px;">
-                        <i class="bi bi-laptop text-primary fs-3"></i>
-                    </div>
-                </div>
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
+                <h6 class="text-uppercase text-muted mb-2 fs-6">Tổng thiết bị</h6>
+                <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalDevices</h3>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 rounded-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase text-muted mb-1 fs-6">Khách hàng</h6>
-                        <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalUsers</h3>
-                    </div>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="background-color: rgba(37, 99, 235, 0.1); width: 60px; height: 60px;">
-                        <i class="bi bi-people text-primary fs-3"></i>
-                    </div>
-                </div>
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
+                <h6 class="text-uppercase text-muted mb-2 fs-6">Khách hàng</h6>
+                <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalUsers</h3>
             </div>
         </div>
     </div>

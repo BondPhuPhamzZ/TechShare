@@ -62,7 +62,8 @@ namespace TechShare.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) return RedirectToAction("Login", "Auth");
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) 
+                return RedirectToAction("Login", "Auth");
 
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return NotFound();
@@ -89,7 +90,8 @@ namespace TechShare.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) return RedirectToAction("Login", "Auth");
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId)) 
+                return RedirectToAction("Login", "Auth");
 
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return NotFound();
@@ -110,7 +112,7 @@ namespace TechShare.Controllers
         // Xác minh CCCD
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UploadCccd(Microsoft.AspNetCore.Http.IFormFile cccdImage)
+        public async Task<IActionResult> UploadCccd(IFormFile cccdImage)
         {
             if (cccdImage == null || cccdImage.Length == 0)
             {
@@ -124,16 +126,16 @@ namespace TechShare.Controllers
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return NotFound();
 
-            string uploadsFolder = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", "cccd");
-            if (!System.IO.Directory.Exists(uploadsFolder))
+            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "cccd");
+            if (!Directory.Exists(uploadsFolder))
             {
-                System.IO.Directory.CreateDirectory(uploadsFolder);
+                Directory.CreateDirectory(uploadsFolder);
             }
 
-            string uniqueFileName = System.Guid.NewGuid().ToString() + "_" + cccdImage.FileName;
-            string filePath = System.IO.Path.Combine(uploadsFolder, uniqueFileName);
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + cccdImage.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            using (var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await cccdImage.CopyToAsync(fileStream);
             }
