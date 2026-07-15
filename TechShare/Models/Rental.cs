@@ -11,6 +11,11 @@ namespace TechShare.Models
         
         public DateTime StartDate { get; set; } 
         public DateTime EndDate { get; set; }
+
+        public DateTime? ActualReturnDate { get; set; } 
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal LateFee { get; set; } = 0;
         
         // Thời điểm Shop xác nhận đã giao cho khách (dùng để tính 2 tiếng báo lỗi)
         public DateTime? ShipTime { get; set; }

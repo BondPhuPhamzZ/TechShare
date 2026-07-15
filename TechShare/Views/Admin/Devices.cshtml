@@ -45,7 +45,14 @@
                                 <td>
                                     @if (item.Status == TechShare.Enums.DeviceStatus.SanSang)
                                     {
-                                        <span class="badge bg-success">Sẵn Sàng</span>
+                                        if (item.StockQuantity == 0)
+                                        {
+                                            <span class="badge bg-secondary">Hết Hàng</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Sẵn Sàng</span>
+                                        }
                                     }
                                     else
                                     {

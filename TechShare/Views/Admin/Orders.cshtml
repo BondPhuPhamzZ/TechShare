@@ -41,6 +41,10 @@
                                 <td>
                                     <span class="text-danger fw-bold">@item.TotalPrice.ToString("N0") đ</span><br/>
                                     <small class="text-muted">Cọc: @item.Device.DepositAmount.ToString("N0") đ</small>
+                                    @if (item.LateFee > 0)
+                                    {
+                                        <br/><small class="text-danger"><i class="bi bi-exclamation-triangle"></i> Phạt trễ: @item.LateFee.ToString("N0") đ</small>
+                                    }
                                 </td>
                                 <td>
                                     @if (item.Status == TechShare.Enums.RentalStatus.ChoDuyet)

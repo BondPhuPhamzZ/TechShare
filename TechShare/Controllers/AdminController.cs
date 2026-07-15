@@ -17,22 +17,29 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        // Dashboard thống kê
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? month, int? year)
         {
+            int selectedMonth = month ?? DateTime.Now.Month;
+            int selectedYear = year ?? DateTime.Now.Year;
+
             var totalUsers = await _context.Users.Where(u => u.Role == "User").CountAsync();
             var totalDevices = await _context.Devices.CountAsync();
             var totalOrders = await _context.Rentals.CountAsync();
             
-            // Tổng doanh thu các đơn hàng đã hoàn tất
+            // Tổng doanh thu các đơn hàng đã hoàn tất trong tháng/năm được chọn
+            // (Tính dựa trên ngày trả máy thực tế)
             var totalRevenue = await _context.Rentals
-                .Where(r => r.Status == Enums.RentalStatus.HoanTat)
+                .Where(r => r.Status == Enums.RentalStatus.HoanTat && r.ActualReturnDate.HasValue)
+                .Where(r => r.ActualReturnDate.Value.Month == selectedMonth && r.ActualReturnDate.Value.Year == selectedYear)
                 .SumAsync(r => r.TotalPrice); 
 
             ViewBag.TotalUsers = totalUsers;
             ViewBag.TotalDevices = totalDevices;
             ViewBag.TotalOrders = totalOrders;
             ViewBag.TotalRevenue = totalRevenue;
+            
+            ViewBag.SelectedMonth = selectedMonth;
+            ViewBag.SelectedYear = selectedYear;
 
             // Đơn hàng cần xử lý (Chờ duyệt)
             var pendingOrders = await _context.Rentals
@@ -159,6 +166,20 @@ namespace TechShare.Controllers
                 (newStatus == Enums.RentalStatus.HoanTat && rental.Status != Enums.RentalStatus.HoanTat))
             {
                 rental.Device.StockQuantity += rental.Quantity;
+                
+                // Nếu là Hoàn Tất (Trả máy thành công), tính toán trả lố ngày
+                if (newStatus == Enums.RentalStatus.HoanTat)
+                {
+                    rental.ActualReturnDate = DateTime.Now;
+                    
+                    if (rental.ActualReturnDate.Value.Date > rental.EndDate.Date)
+                    {
+                        int lateDays = (rental.ActualReturnDate.Value.Date - rental.EndDate.Date).Days;
+                        // Phạt 150% giá thuê một ngày
+                        rental.LateFee = lateDays * rental.Device.PricePerDay * 1.5m;
+                        rental.TotalPrice += rental.LateFee;
+                    }
+                }
             }
 
             // Ghi nhận thời điểm khách nhận máy (bắt đầu tính 2h)

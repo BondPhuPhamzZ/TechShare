@@ -2,7 +2,44 @@
 @{
     ViewData["Title"] = "Bảng điều khiển chung";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    
+    int selectedMonth = ViewBag.SelectedMonth ?? DateTime.Now.Month;
+    int selectedYear = ViewBag.SelectedYear ?? DateTime.Now.Year;
 }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0 fw-bold">Tổng quan hệ thống</h4>
+    <form method="get" class="d-flex align-items-center gap-2">
+        <label class="fw-bold text-muted text-nowrap">Doanh thu tháng:</label>
+        <select name="month" class="form-select form-select-sm" style="width: 80px;">
+            @for (int i = 1; i <= 12; i++)
+            {
+                if (i == selectedMonth)
+                {
+                    <option value="@i" selected>@i</option>
+                }
+                else
+                {
+                    <option value="@i">@i</option>
+                }
+            }
+        </select>
+        <select name="year" class="form-select form-select-sm" style="width: 100px;">
+            @for (int i = 2024; i <= DateTime.Now.Year + 1; i++)
+            {
+                if (i == selectedYear)
+                {
+                    <option value="@i" selected>@i</option>
+                }
+                else
+                {
+                    <option value="@i">@i</option>
+                }
+            }
+        </select>
+        <button type="submit" class="btn btn-sm btn-primary">Lọc</button>
+    </form>
+</div>
 
 <div class="row mb-4 g-4">
     <div class="col-md-3">
