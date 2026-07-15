@@ -2,12 +2,28 @@
 @{
     ViewData["Title"] = "Quản lý Thiết bị";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var categories = ViewBag.Categories as IEnumerable<TechShare.Models.Category>;
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Lỗi:</strong> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Thành công:</strong> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
 
 <div class="card shadow-sm border-0">
     <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 fw-bold">Danh sách Thiết Bị</h5>
-        <a asp-controller="Device" asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Thêm mới</a>
+        <button class="btn btn-primary" onclick="openCreateModal()"><i class="bi bi-plus-lg me-1"></i> Thêm mới</button>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -60,7 +76,19 @@
                                     }
                                 </td>
                                 <td class="text-end">
-                                    <a asp-controller="Device" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Sửa</a>
+                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                            onclick="openEditModal(this)"
+                                            data-id="@item.Id"
+                                            data-name="@item.Name"
+                                            data-category="@item.CategoryId"
+                                            data-price="@item.PricePerDay"
+                                            data-deposit="@item.DepositAmount"
+                                            data-stock="@item.StockQuantity"
+                                            data-status="@((int)item.Status)"
+                                            data-desc="@item.Description"
+                                            data-spec="@item.Specifications">
+                                        <i class="bi bi-pencil"></i> Sửa
+                                    </button>
                                     <form asp-controller="Device" asp-action="Delete" method="post" class="d-inline">
                                         <input type="hidden" name="id" value="@item.Id" />
                                         <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn tạm ẩn thiết bị này?');"><i class="bi bi-trash"></i> Xóa</button>
@@ -80,3 +108,122 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Create/Edit -->
+<div class="modal fade" id="deviceModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="deviceForm" asp-controller="Device" asp-action="Create" method="post" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="deviceModalLabel">Thêm Thiết Bị Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modalId" name="Id" value="0" />
+                    <input type="hidden" name="RedirectUrl" value="/Admin/Devices" />
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Tên Thiết Bị <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="modalName" name="Name" required maxlength="200" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Danh Mục <span class="text-danger">*</span></label>
+                            <select class="form-select" id="modalCategory" name="CategoryId" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                @if(categories != null)
+                                {
+                                    foreach(var cat in categories)
+                                    {
+                                        <option value="@cat.Id">@cat.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Giá Thuê / Ngày <span class="text-danger">*</span></label>
+                            <input type="number" step="0.01" class="form-control" id="modalPrice" name="PricePerDay" required min="1" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Tiền Cọc <span class="text-danger">*</span></label>
+                            <input type="number" step="0.01" class="form-control" id="modalDeposit" name="DepositAmount" required min="1" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Tồn Kho <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="modalStock" name="StockQuantity" required min="0" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Ảnh (Để trống nếu không đổi)</label>
+                            <input type="file" class="form-control" id="modalImage" name="ImageFile" accept="image/*" />
+                            <small class="text-muted" id="imageHelp">Chọn ảnh mới để thay thế.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Trạng Thái <span class="text-danger">*</span></label>
+                            <select class="form-select" id="modalStatus" name="Status" required>
+                                <option value="0">Sẵn Sàng</option>
+                                <option value="1">Hết Hàng</option>
+                                <option value="2">Bảo Trì / Ẩn</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Mô Tả</label>
+                            <textarea class="form-control" id="modalDesc" name="Description" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Thông số kỹ thuật</label>
+                            <textarea class="form-control" id="modalSpec" name="Specifications" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmitModal">Lưu Thiết Bị</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var deviceModal = new bootstrap.Modal(document.getElementById('deviceModal'));
+
+        function openCreateModal() {
+            document.getElementById('deviceModalLabel').innerText = 'Thêm Thiết Bị Mới';
+            document.getElementById('deviceForm').action = '/Device/Create';
+            document.getElementById('deviceForm').reset();
+            document.getElementById('modalId').value = 0;
+            document.getElementById('modalImage').required = true;
+            document.getElementById('imageHelp').innerText = 'Bắt buộc chọn ảnh cho thiết bị mới.';
+            
+            deviceModal.show();
+        }
+
+        function openEditModal(btn) {
+            document.getElementById('deviceModalLabel').innerText = 'Cập Nhật Thiết Bị';
+            document.getElementById('deviceForm').action = '/Device/Edit';
+            document.getElementById('deviceForm').reset();
+            
+            // Lấy data từ attribute của nút bấm
+            document.getElementById('modalId').value = btn.getAttribute('data-id');
+            document.getElementById('modalName').value = btn.getAttribute('data-name');
+            document.getElementById('modalCategory').value = btn.getAttribute('data-category');
+            
+            // Xử lý giá tiền (bỏ dấu , nếu có)
+            let price = btn.getAttribute('data-price').replace(/,/g, '');
+            let deposit = btn.getAttribute('data-deposit').replace(/,/g, '');
+            document.getElementById('modalPrice').value = price;
+            document.getElementById('modalDeposit').value = deposit;
+            
+            document.getElementById('modalStock').value = btn.getAttribute('data-stock');
+            document.getElementById('modalStatus').value = btn.getAttribute('data-status');
+            document.getElementById('modalDesc').value = btn.getAttribute('data-desc') || '';
+            document.getElementById('modalSpec').value = btn.getAttribute('data-spec') || '';
+            
+            document.getElementById('modalImage').required = false;
+            document.getElementById('imageHelp').innerText = 'Để trống nếu muốn giữ nguyên ảnh cũ.';
+            
+            deviceModal.show();
+        }
+    </script>
+}

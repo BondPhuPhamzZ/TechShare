@@ -22,6 +22,9 @@ namespace TechShare.ViewModels
         [Required(ErrorMessage = "Vui lòng nhập số lượng tồn kho")]
         public int StockQuantity { get; set; }
 
+        public TechShare.Enums.DeviceStatus Status { get; set; }
+
+        public string? Specifications { get; set; }
 
         public IFormFile? ImageFile { get; set; }
     }

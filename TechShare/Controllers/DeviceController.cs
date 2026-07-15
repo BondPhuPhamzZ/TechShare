@@ -82,15 +82,7 @@ namespace TechShare.Controllers
             return View(devices);
         }
 
-        // Trang upload thiết bị
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create()
-        {
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
-            return View();
-        }
-
-        // Xử lý đăng thiết bị cho thuê lên
+        // Xử lý Thêm thiết bị mới (Từ Modal)
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -98,41 +90,48 @@ namespace TechShare.Controllers
         {
             if (model.ImageFile == null)
             {
-                ModelState.AddModelError("ImageFile", "Vui lòng chọn ảnh thiết bị");
+                TempData["ErrorMessage"] = "Vui lòng chọn ảnh thiết bị!";
+                return RedirectToAction("Devices", "Admin");
+            }
+
+            if (model.PricePerDay <= 0 || model.DepositAmount <= 0)
+            {
+                TempData["ErrorMessage"] = "Giá thuê và Tiền cọc phải lớn hơn 0!";
+                return RedirectToAction("Devices", "Admin");
+            }
+
+            if (model.StockQuantity < 0)
+            {
+                TempData["ErrorMessage"] = "Tồn kho không được âm!";
+                return RedirectToAction("Devices", "Admin");
             }
 
             if (ModelState.IsValid)
             {
                 string uniqueFileName = "";
 
-                if (model.ImageFile != null)
+                // Kiểm tra định dạng đuôi file ảnh
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                var extension = Path.GetExtension(model.ImageFile.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(extension))
                 {
-                    // Kiểm tra định dạng đuôi file ảnh
-                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-                    var extension = Path.GetExtension(model.ImageFile.FileName).ToLower();
+                    TempData["ErrorMessage"] = "Chỉ hỗ trợ file ảnh (.jpg, .jpeg, .png, .gif)";
+                    return RedirectToAction("Devices", "Admin");
+                }
 
-                    if (!allowedExtensions.Contains(extension))
-                    {
-                        ModelState.AddModelError("ImageFile", "Chỉ hỗ trợ file ảnh (.jpg, .jpeg, .png, .gif)");
-                        ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
-                        TempData["ErrorMessage"] = "Đăng bài thất bại: Sai định dạng ảnh!";
-                        return View(model);
-                    }
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
 
-                    string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
-                    
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await model.ImageFile.CopyToAsync(fileStream);
-                    }
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(fileStream);
                 }
 
                 // Tạo thông tin thiết bị lưu vào DB
@@ -144,46 +143,23 @@ namespace TechShare.Controllers
                     DepositAmount = model.DepositAmount,
                     StockQuantity = model.StockQuantity,
                     Description = model.Description,
+                    Specifications = model.Specifications,
+                    Status = model.Status,
                     ImageUrl = "/images/" + uniqueFileName
                 };
 
                 _context.Devices.Add(device);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Đăng bài thành công!";
+                TempData["SuccessMessage"] = "Thêm thiết bị mới thành công!";
                 return RedirectToAction("Devices", "Admin");
             }
 
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
-            return View(model);
+            TempData["ErrorMessage"] = "Dữ liệu không hợp lệ!";
+            return RedirectToAction("Devices", "Admin");
         }
 
-        // Chỉnh sửa thiết bị (GET)
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var device = await _context.Devices.FindAsync(id);
-            if (device == null)
-            {
-                return NotFound();
-            }
-
-            var model = new DeviceCreateViewModel
-            {
-                Name = device.Name,
-                CategoryId = device.CategoryId,
-                PricePerDay = device.PricePerDay,
-                DepositAmount = device.DepositAmount,
-                StockQuantity = device.StockQuantity,
-                Description = device.Description
-                // ImageUrl will be kept if ImageFile is null
-            };
-            ViewBag.CurrentImageUrl = device.ImageUrl;
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", device.CategoryId);
-            return View(model);
-        }
-
-        // Xử lý chỉnh sửa thiết bị
+        // Xử lý Cập nhật thiết bị (Từ Modal)
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -192,7 +168,20 @@ namespace TechShare.Controllers
             var device = await _context.Devices.FindAsync(id);
             if (device == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Không tìm thấy thiết bị!";
+                return RedirectToAction("Devices", "Admin");
+            }
+
+            if (model.PricePerDay <= 0 || model.DepositAmount <= 0)
+            {
+                TempData["ErrorMessage"] = "Giá thuê và Tiền cọc phải lớn hơn 0!";
+                return RedirectToAction("Devices", "Admin");
+            }
+
+            if (model.StockQuantity < 0)
+            {
+                TempData["ErrorMessage"] = "Tồn kho không được âm!";
+                return RedirectToAction("Devices", "Admin");
             }
 
             if (ModelState.IsValid)
@@ -204,14 +193,11 @@ namespace TechShare.Controllers
 
                     if (!allowedExtensions.Contains(extension))
                     {
-                        ModelState.AddModelError("ImageFile", "Chỉ hỗ trợ file ảnh (.jpg, .jpeg, .png, .gif)");
-                        ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
-                        ViewBag.CurrentImageUrl = device.ImageUrl;
-                        return View(model);
+                        TempData["ErrorMessage"] = "Chỉ hỗ trợ file ảnh (.jpg, .jpeg, .png, .gif)";
+                        return RedirectToAction("Devices", "Admin");
                     }
 
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "images");
-
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -233,6 +219,8 @@ namespace TechShare.Controllers
                 device.DepositAmount = model.DepositAmount;
                 device.StockQuantity = model.StockQuantity;
                 device.Description = model.Description;
+                device.Specifications = model.Specifications;
+                device.Status = model.Status;
 
                 await _context.SaveChangesAsync();
 
@@ -240,9 +228,8 @@ namespace TechShare.Controllers
                 return RedirectToAction("Devices", "Admin");
             }
 
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
-            ViewBag.CurrentImageUrl = device.ImageUrl;
-            return View(model);
+            TempData["ErrorMessage"] = "Dữ liệu cập nhật không hợp lệ!";
+            return RedirectToAction("Devices", "Admin");
         }
 
         // Xóa (Ẩn) thiết bị

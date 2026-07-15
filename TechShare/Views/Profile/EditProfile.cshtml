@@ -12,8 +12,6 @@
                 </div>
                 <div class="card-body p-4">
                     <form asp-action="EditProfile" method="post">
-                        @Html.AntiForgeryToken()
-                        
                         <div class="mb-3">
                             <label class="form-label fw-bold">Họ và tên</label>
                             <input asp-for="FullName" class="form-control" />

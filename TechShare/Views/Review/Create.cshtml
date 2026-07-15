@@ -13,8 +13,7 @@
                 <div class="card-body p-4">
                     <p class="text-center text-muted mb-4">Bạn vừa hoàn thành việc thuê <strong>@Model.Device.Name</strong>. Để Cửa Hàng ngày một tốt hơn, hãy để lại đánh giá của bạn nhé!</p>
                     
-                    <form action="/Review/SubmitReview" method="post">
-                        @Html.AntiForgeryToken()
+                    <form asp-controller="Review" asp-action="SubmitReview" method="post">
                         <input type="hidden" name="rentalId" value="@Model.Id" />
                         
                         <div class="mb-4 text-center bg-light p-3 rounded">

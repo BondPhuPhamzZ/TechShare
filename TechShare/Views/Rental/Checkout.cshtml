@@ -50,8 +50,7 @@
                 </div>
             </div>
 
-            <form action="/Rental/ConfirmCheckout" method="post">
-                @Html.AntiForgeryToken()
+            <form asp-controller="Rental" asp-action="ConfirmCheckout" method="post">
                 <input type="hidden" name="deviceId" value="@Model.Id" />
                 <input type="hidden" name="startDate" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
                 <input type="hidden" name="endDate" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />

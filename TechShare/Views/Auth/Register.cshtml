@@ -11,8 +11,6 @@
                     <h2 class="text-center fw-bold text-primary mb-4">Đăng Ký Tài Khoản</h2>
                     
                     <form asp-action="Register" method="post">
-                        @Html.AntiForgeryToken()
-                        
                         <div class="mb-3">
                             <label class="form-label fw-bold">Họ và Tên</label>
                             <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn A" />
@@ -57,5 +55,5 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
 }

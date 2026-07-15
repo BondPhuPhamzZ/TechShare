@@ -26,8 +26,6 @@ namespace TechShare.Controllers
             var totalDevices = await _context.Devices.CountAsync();
             var totalOrders = await _context.Rentals.CountAsync();
             
-            // Tổng doanh thu các đơn hàng đã hoàn tất trong tháng/năm được chọn
-            // (Tính dựa trên ngày trả máy thực tế)
             var totalRevenue = await _context.Rentals
                 .Where(r => r.Status == Enums.RentalStatus.HoanTat && r.ActualReturnDate.HasValue)
                 .Where(r => r.ActualReturnDate.Value.Month == selectedMonth && r.ActualReturnDate.Value.Year == selectedYear)
@@ -41,7 +39,6 @@ namespace TechShare.Controllers
             ViewBag.SelectedMonth = selectedMonth;
             ViewBag.SelectedYear = selectedYear;
 
-            // Đơn hàng cần xử lý (Chờ duyệt)
             var pendingOrders = await _context.Rentals
                 .Include(r => r.Renter)
                 .Include(r => r.Device)
@@ -53,21 +50,19 @@ namespace TechShare.Controllers
             return View(pendingOrders);
         }
 
-        // Quản lý Thiết bị
         public async Task<IActionResult> Devices()
         {
             var devices = await _context.Devices.Include(d => d.Category).OrderByDescending(d => d.Id).ToListAsync();
+            ViewBag.Categories = await _context.Categories.ToListAsync();
             return View(devices);
         }
 
-        // Quản lý Danh mục
         public async Task<IActionResult> Categories()
         {
             var categories = await _context.Categories.Include(c => c.Devices).OrderByDescending(c => c.Id).ToListAsync();
             return View(categories);
         }
 
-        // Quản lý Đơn thuê
         public async Task<IActionResult> Orders()
         {
             var orders = await _context.Rentals
@@ -78,14 +73,12 @@ namespace TechShare.Controllers
             return View(orders);
         }
 
-        // Quản lý Khách hàng
         public async Task<IActionResult> Users()
         {
             var users = await _context.Users.Where(u => u.Role == "User").OrderByDescending(u => u.CreatedAt).ToListAsync();
             return View(users);
         }
 
-        // Quản lý Đánh giá
         public async Task<IActionResult> Reviews()
         {
             var reviews = await _context.Reviews

@@ -11,8 +11,6 @@ using TechShare.ViewModels;
 
 namespace TechShare.Controllers
 {
-    // Trạng thái/ tiến độ thuê thiết bị
-
     [Authorize]
     public class OrderController : Controller
     {
@@ -23,7 +21,6 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        // Lịch sử / Tiến độ các thiết bị mình đang thuê
         public async Task<IActionResult> Index()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -56,7 +53,6 @@ namespace TechShare.Controllers
 
 
 
-        // Khách thuê báo lỗi
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReportIssue(int id)
@@ -70,7 +66,6 @@ namespace TechShare.Controllers
             return RedirectToAction("Index");
         }
 
-        // Khách thuê trả máy
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReturnDevice(int id)
