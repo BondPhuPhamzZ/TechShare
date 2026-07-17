@@ -78,5 +78,26 @@ namespace TechShare.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Invoice(int id)
+        {
+            var rental = await _context.Rentals
+                .Include(r => r.Renter)
+                .Include(r => r.Device)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (rental == null)
+                return NotFound();
+
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bool isAdmin = User.IsInRole("Admin");
+
+            if (!isAdmin && (string.IsNullOrEmpty(userIdStr) || rental.RenterId.ToString() != userIdStr))
+            {
+                return Forbid();
+            }
+
+            return View(rental);
+        }
     }
 }

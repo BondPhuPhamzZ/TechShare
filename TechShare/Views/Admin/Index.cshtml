@@ -3,40 +3,15 @@
     ViewData["Title"] = "Bảng điều khiển chung";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     
-    int selectedMonth = ViewBag.SelectedMonth ?? DateTime.Now.Month;
-    int selectedYear = ViewBag.SelectedYear ?? DateTime.Now.Year;
+    DateTime selectedDate = ViewBag.SelectedDate ?? DateTime.Today;
+    var completedOrders = ViewBag.CompletedOrders as IEnumerable<TechShare.Models.Rental>;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0 fw-bold">Tổng quan hệ thống</h4>
     <form asp-controller="Admin" asp-action="Index" method="get" class="d-flex align-items-center gap-2">
-        <label class="fw-bold text-muted text-nowrap">Doanh thu tháng:</label>
-        <select name="month" class="form-select form-select-sm" style="width: 80px;">
-            @for (int i = 1; i <= 12; i++)
-            {
-                if (i == selectedMonth)
-                {
-                    <option value="@i" selected>@i</option>
-                }
-                else
-                {
-                    <option value="@i">@i</option>
-                }
-            }
-        </select>
-        <select name="year" class="form-select form-select-sm" style="width: 100px;">
-            @for (int i = 2024; i <= DateTime.Now.Year + 1; i++)
-            {
-                if (i == selectedYear)
-                {
-                    <option value="@i" selected>@i</option>
-                }
-                else
-                {
-                    <option value="@i">@i</option>
-                }
-            }
-        </select>
+        <label class="fw-bold text-muted text-nowrap">Chọn ngày lọc:</label>
+        <input type="date" name="filterDate" class="form-control form-control-sm" value="@selectedDate.ToString("yyyy-MM-dd")" style="width: 150px;" />
         <button type="submit" class="btn btn-sm btn-primary">Lọc</button>
     </form>
 </div>
@@ -45,14 +20,22 @@
     <div class="col-md-3">
         <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 rounded-3">
             <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
-                <h6 class="text-uppercase text-muted mb-2 fs-6">Doanh thu</h6>
-                <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalRevenue.ToString("N0") đ</h3>
+                <h6 class="text-uppercase text-muted mb-2 fs-6">Doanh thu ngày @selectedDate.ToString("dd/MM")</h6>
+                <h3 class="fw-bold text-dark mb-0">@ViewBag.RevenueOfDay.ToString("N0") đ</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-white shadow-sm border-0 border-start border-success border-4 h-100 rounded-3">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
+                <h6 class="text-uppercase text-muted mb-2 fs-6">Doanh thu tháng @selectedDate.Month</h6>
+                <h3 class="fw-bold text-dark mb-0">@ViewBag.RevenueOfMonth.ToString("N0") đ</h3>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <a asp-action="Orders" class="text-decoration-none">
-            <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 position-relative hover-shadow transition-all rounded-3">
+            <div class="card bg-white shadow-sm border-0 border-start border-warning border-4 h-100 position-relative hover-shadow transition-all rounded-3">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
                     <h6 class="text-uppercase text-muted mb-2 fs-6">Đơn cho thuê</h6>
                     <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalOrders</h3>
@@ -61,20 +44,124 @@
         </a>
     </div>
     <div class="col-md-3">
-        <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 rounded-3">
+        <div class="card bg-white shadow-sm border-0 border-start border-info border-4 h-100 rounded-3">
             <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
                 <h6 class="text-uppercase text-muted mb-2 fs-6">Tổng thiết bị</h6>
                 <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalDevices</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 rounded-3">
-            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
-                <h6 class="text-uppercase text-muted mb-2 fs-6">Khách hàng</h6>
-                <h3 class="fw-bold text-dark mb-0">@ViewBag.TotalUsers</h3>
-            </div>
+</div>
+
+<!-- BIỂU ĐỒ DOANH THU -->
+<div class="card shadow-sm border-0 mb-4 rounded-3">
+    <div class="card-header bg-white border-bottom py-3">
+        <h5 class="mb-0 fw-bold">Biểu đồ doanh thu tháng @selectedDate.Month/@selectedDate.Year</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="revenueChart" style="max-height: 350px;"></canvas>
+    </div>
+</div>
+
+<!-- BẢNG CHI TIẾT ĐƠN HÀNG HOÀN TẤT TRONG NGÀY -->
+<div class="card shadow-sm border-0 mb-4 rounded-3">
+    <div class="card-header bg-white border-bottom py-3">
+        <h5 class="mb-0 fw-bold text-success">Danh sách đơn hàng hoàn tất ngày @selectedDate.ToString("dd/MM/yyyy")</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Mã Đơn</th>
+                        <th>Khách Hàng</th>
+                        <th>Thiết Bị</th>
+                        <th>Ngày Đặt</th>
+                        <th>Ngày Trả (Thực Tế)</th>
+                        <th class="text-end pe-4">Tổng Tiền Thu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (completedOrders != null && completedOrders.Any())
+                    {
+                        foreach (var order in completedOrders)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold">#@order.Id</td>
+                                <td>@order.Renter?.FullName</td>
+                                <td>@order.Device?.Name</td>
+                                <td>@order.StartDate.ToString("dd/MM/yyyy")</td>
+                                <td class="text-success fw-bold">@order.ActualReturnDate?.ToString("dd/MM/yyyy")</td>
+                                <td class="text-end pe-4 fw-bold text-primary">@order.TotalPrice.ToString("N0") đ</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">Không có đơn hàng nào hoàn tất trong ngày này.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            // Lấy dữ liệu từ ViewBag qua JSON
+            var labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.ChartLabels));
+            var data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.ChartData));
+
+            var revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return value.toLocaleString() + ' đ';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString() + ' đ';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

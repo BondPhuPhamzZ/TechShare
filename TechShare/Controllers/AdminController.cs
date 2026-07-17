@@ -17,28 +17,65 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? month, int? year)
+        // Trang thống kê
+        public async Task<IActionResult> Index(DateTime? filterDate)
         {
-            int selectedMonth = month ?? DateTime.Now.Month;
-            int selectedYear = year ?? DateTime.Now.Year;
+            var dateToFilter = filterDate ?? DateTime.Today;
 
             var totalUsers = await _context.Users.Where(u => u.Role == "User").CountAsync();
             var totalDevices = await _context.Devices.CountAsync();
             var totalOrders = await _context.Rentals.CountAsync();
             
-            var totalRevenue = await _context.Rentals
+            // 1. Doanh thu của NGÀY được chọn
+            var revenueOfDay = await _context.Rentals
                 .Where(r => r.Status == Enums.RentalStatus.HoanTat && r.ActualReturnDate.HasValue)
-                .Where(r => r.ActualReturnDate.Value.Month == selectedMonth && r.ActualReturnDate.Value.Year == selectedYear)
+                .Where(r => r.ActualReturnDate.Value.Date == dateToFilter.Date)
                 .SumAsync(r => r.TotalPrice); 
+
+            // 2. Doanh thu của THÁNG được chọn
+            var revenueOfMonth = await _context.Rentals
+                .Where(r => r.Status == Enums.RentalStatus.HoanTat && r.ActualReturnDate.HasValue)
+                .Where(r => r.ActualReturnDate.Value.Month == dateToFilter.Month && r.ActualReturnDate.Value.Year == dateToFilter.Year)
+                .SumAsync(r => r.TotalPrice);
+
+            // 3. Chuẩn bị dữ liệu cho Biểu đồ (Doanh thu các ngày trong tháng)
+            int daysInMonth = DateTime.DaysInMonth(dateToFilter.Year, dateToFilter.Month);
+            var monthlyData = await _context.Rentals
+                .Where(r => r.Status == Enums.RentalStatus.HoanTat && r.ActualReturnDate.HasValue)
+                .Where(r => r.ActualReturnDate.Value.Month == dateToFilter.Month && r.ActualReturnDate.Value.Year == dateToFilter.Year)
+                .GroupBy(r => r.ActualReturnDate.Value.Day)
+                .Select(g => new { Day = g.Key, Total = g.Sum(r => r.TotalPrice) })
+                .ToListAsync();
+
+            var chartLabels = Enumerable.Range(1, daysInMonth).Select(d => $"{d}/{dateToFilter.Month}").ToList();
+            var chartData = new decimal[daysInMonth];
+            foreach (var item in monthlyData)
+            {
+                chartData[item.Day - 1] = item.Total;
+            }
+
+            ViewBag.ChartLabels = chartLabels;
+            ViewBag.ChartData = chartData;
 
             ViewBag.TotalUsers = totalUsers;
             ViewBag.TotalDevices = totalDevices;
             ViewBag.TotalOrders = totalOrders;
-            ViewBag.TotalRevenue = totalRevenue;
-            
-            ViewBag.SelectedMonth = selectedMonth;
-            ViewBag.SelectedYear = selectedYear;
+            ViewBag.RevenueOfDay = revenueOfDay;
+            ViewBag.RevenueOfMonth = revenueOfMonth;
+            ViewBag.SelectedDate = dateToFilter;
 
+            // 4. Danh sách các đơn hàng hoàn tất trong NGÀY
+            var completedOrders = await _context.Rentals
+                .Include(r => r.Renter)
+                .Include(r => r.Device)
+                .Where(r => r.Status == Enums.RentalStatus.HoanTat && r.ActualReturnDate.HasValue)
+                .Where(r => r.ActualReturnDate.Value.Date == dateToFilter.Date)
+                .OrderByDescending(r => r.ActualReturnDate)
+                .ToListAsync();
+
+            ViewBag.CompletedOrders = completedOrders;
+
+            // Đơn hàng cần xử lý (Chờ duyệt)
             var pendingOrders = await _context.Rentals
                 .Include(r => r.Renter)
                 .Include(r => r.Device)
@@ -50,6 +87,7 @@ namespace TechShare.Controllers
             return View(pendingOrders);
         }
 
+        // Views
         public async Task<IActionResult> Devices()
         {
             var devices = await _context.Devices.Include(d => d.Category).OrderByDescending(d => d.Id).ToListAsync();
@@ -90,6 +128,7 @@ namespace TechShare.Controllers
             return View(reviews);
         }
 
+        // Quản lý đánh giá
         [HttpPost]
         public async Task<IActionResult> DeleteReview(int id)
         {
@@ -106,6 +145,8 @@ namespace TechShare.Controllers
             }
             return RedirectToAction("Reviews");
         }
+
+        // Khóa TK Cus
         [HttpPost]
         public async Task<IActionResult> ToggleUserLock(int id)
         {
@@ -141,6 +182,7 @@ namespace TechShare.Controllers
             return RedirectToAction("Users");
         }
 
+        // Trạng thái khi trả máy
         [HttpPost]
         public async Task<IActionResult> UpdateOrderStatus(int id, Enums.RentalStatus newStatus)
         {
@@ -154,13 +196,11 @@ namespace TechShare.Controllers
                 return RedirectToAction("Orders");
             }
 
-            // Hủy đơn/ Trả máy -> Trả lại số lượng máy vào kho
             if ((newStatus == Enums.RentalStatus.DaHuy && rental.Status != Enums.RentalStatus.DaHuy) ||
                 (newStatus == Enums.RentalStatus.HoanTat && rental.Status != Enums.RentalStatus.HoanTat))
             {
                 rental.Device.StockQuantity += rental.Quantity;
                 
-                // Nếu là Hoàn Tất (Trả máy thành công), tính toán trả lố ngày
                 if (newStatus == Enums.RentalStatus.HoanTat)
                 {
                     rental.ActualReturnDate = DateTime.Now;
