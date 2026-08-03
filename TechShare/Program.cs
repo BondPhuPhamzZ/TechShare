@@ -27,6 +27,7 @@ builder.Services.AddAuthentication("Cookies")
 
             // Add Custom Services
             builder.Services.AddScoped<TechShare.Services.IPasswordHasherService, TechShare.Services.PasswordHasherService>();
+            builder.Services.AddScoped<TechShare.Services.IVNPayService, TechShare.Services.VNPayService>();
 
             var app = builder.Build();
 

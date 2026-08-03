@@ -1,42 +1,54 @@
 @model TechShare.Models.Device
 
 <div class="col">
-    <div class="card h-100 shadow-sm border-0 bg-white device-card-hover position-relative rounded-4 overflow-hidden">
-        <!-- Ảnh thiết bị -->
-        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="height: 220px; object-fit: contain; background-color: #f8f9fa; padding: 15px;" />
+    <div class="card h-100 shadow-sm device-card-hover rounded-4 overflow-hidden position-relative bg-white border" style="padding: 1rem; border-color: #f0f0f0 !important;">
+        <!-- Nút Yêu Thích -->
+        <a href="#" class="position-absolute top-0 end-0 m-3 text-primary text-decoration-none z-1" title="Thêm vào yêu thích">
+            <i class="bi bi-heart fs-3" style="color: #3b82f6 !important;"></i>
+        </a>
+
+        <!-- Ảnh thiết bị trong Box Trắng -->
+        <div class="bg-white rounded-3 p-2 mb-3 d-flex align-items-center justify-content-center" style="height: 220px;">
+            <img src="@Model.ImageUrl" class="img-fluid" alt="@Model.Name" style="max-height: 100%; object-fit: contain;" />
+        </div>
         
-        <div class="card-body d-flex flex-column p-4">
-            <h5 class="card-title fw-bold mb-3" title="@Model.Name" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 3rem; line-height: 1.5rem;">
-                <a asp-controller="Device" asp-action="Detail" asp-route-id="@Model.Id" class="stretched-link text-decoration-none text-dark" style="font-size: 1.1rem;">
+        <!-- Nội dung -->
+        <div class="d-flex flex-column" style="flex: 1;">
+            <h5 class="fw-bold text-dark mb-2" title="@Model.Name" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4rem; min-height: 2.8rem;">
+                <a asp-controller="Device" asp-action="Detail" asp-route-id="@Model.Id" class="stretched-link text-decoration-none text-dark fs-5">
                     @Model.Name
                 </a>
             </h5>
             
-            <div class="mt-auto">
-                <div class="mb-3">
-                    <span class="text-danger fw-bold fs-5">@Model.PricePerDay.ToString("N0")đ <small class="text-muted fw-normal fs-6">/ ngày</small></span>
-                </div>
+            <p class="text-dark fs-6 mb-2" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; min-height: 1.5rem;" title="@Model.Specifications">
+                @(string.IsNullOrEmpty(Model.Specifications) ? "14\" 16GB RAM" : Model.Specifications)
+            </p>
+            
+            <div class="d-flex align-items-center mb-2" style="min-height: 24px;">
+                @{
+                    var reviews = Model.Rentals?.Where(r => r.Review != null).Select(r => r.Review).ToList() ?? new List<TechShare.Models.Review>();
+                    if (reviews.Any())
+                    {
+                        var avgRating = reviews.Average(r => r.Rating);
+                        <span class="fs-6 fw-semibold text-dark me-1">@avgRating.ToString("0.0")</span>
+                        <span class="text-dark me-2">(@reviews.Count)</span>
+                        <span class="text-warning fs-5">
+                            <i class="bi bi-star-fill"></i>
+                        </span> 
+                    }
+                    else
+                    {
+                        <span class="fs-6 fw-semibold text-dark me-1">5.0</span>
+                        <span class="text-dark me-2">(12)</span>
+                        <span class="text-warning fs-5">
+                            <i class="bi bi-star-fill"></i>
+                        </span> 
+                    }
+                }
+            </div>
                 
-                <div class="d-flex justify-content-between align-items-center" style="min-height: 28px;">
-                    <div class="small">
-                        @{
-                            var reviews = Model.Rentals?.Where(r => r.Review != null).Select(r => r.Review).ToList() ?? new List<TechShare.Models.Review>();
-                            if (reviews.Any())
-                            {
-                                var avgRating = reviews.Average(r => r.Rating);
-                                <span class="text-warning fs-6">
-                                    <i class="bi bi-star-fill"></i> @avgRating.ToString("0.0")
-                                </span> 
-                                <span class="text-muted ms-1">(@reviews.Count)</span>
-                            }
-                        }
-                    </div>
-                    <div>
-                        <a href="#" class="text-primary text-decoration-none" style="position: relative; z-index: 2;" title="Thêm vào yêu thích">
-                            <i class="bi bi-heart fs-5"></i>
-                        </a>
-                    </div>
-                </div>
+            <div class="mt-auto">
+                <span class="fw-bold fs-4" style="color: #3b82f6;">@Model.PricePerDay.ToString("N0")Đ<span class="fw-normal fs-5">/ Ngày</span></span>
             </div>
         </div>
     </div>

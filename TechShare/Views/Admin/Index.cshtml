@@ -16,8 +16,8 @@
     </form>
 </div>
 
-<div class="row mb-4 g-4">
-    <div class="col-md-3">
+<div class="row mb-4 g-4 justify-content-center">
+    <div class="col-md-4">
         <div class="card bg-white shadow-sm border-0 border-start border-primary border-4 h-100 rounded-3">
             <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
                 <h6 class="text-uppercase text-muted mb-2 fs-6">Doanh thu ngày @selectedDate.ToString("dd/MM")</h6>
@@ -25,15 +25,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card bg-white shadow-sm border-0 border-start border-success border-4 h-100 rounded-3">
-            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
-                <h6 class="text-uppercase text-muted mb-2 fs-6">Doanh thu tháng @selectedDate.Month</h6>
-                <h3 class="fw-bold text-dark mb-0">@ViewBag.RevenueOfMonth.ToString("N0") đ</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <a asp-action="Orders" class="text-decoration-none">
             <div class="card bg-white shadow-sm border-0 border-start border-warning border-4 h-100 position-relative hover-shadow transition-all rounded-3">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
@@ -43,7 +35,7 @@
             </div>
         </a>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card bg-white shadow-sm border-0 border-start border-info border-4 h-100 rounded-3">
             <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-4">
                 <h6 class="text-uppercase text-muted mb-2 fs-6">Tổng thiết bị</h6>

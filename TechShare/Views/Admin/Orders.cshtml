@@ -35,15 +35,16 @@
                                 </td>
                                 <td>@item.Device.Name</td>
                                 <td>
+                                    <small class="text-muted">Thời gian thuê:</small><br/>
                                     @item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")<br/>
                                     <small class="text-muted">(@((item.EndDate - item.StartDate).Days) ngày)</small>
                                 </td>
                                 <td>
-                                    <span class="text-danger fw-bold">@item.TotalPrice.ToString("N0") đ</span><br/>
+                                    <span class="text-primary fw-bold">@item.TotalPrice.ToString("N0") đ</span><br/>
                                     <small class="text-muted">Cọc: @item.Device.DepositAmount.ToString("N0") đ</small>
                                     @if (item.LateFee > 0)
                                     {
-                                        <br/><small class="text-danger"><i class="bi bi-exclamation-triangle"></i> Phạt trễ: @item.LateFee.ToString("N0") đ</small>
+                                        <br/><small class="text-primary"> Phạt trễ: @item.LateFee.ToString("N0") đ</small>
                                     }
                                 </td>
                                 <td>

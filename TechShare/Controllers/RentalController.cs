@@ -76,7 +76,7 @@ namespace TechShare.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmCheckout(TechShare.ViewModels.RentalCheckoutViewModel model)
+        public async Task<IActionResult> ConfirmCheckout(TechShare.ViewModels.RentalCheckoutViewModel model, [FromServices] TechShare.Services.IVNPayService vnPayService)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
@@ -96,6 +96,47 @@ namespace TechShare.Controllers
                 rentDays = 1;
             decimal totalPrice = rentDays * device.PricePerDay * model.Quantity;
 
+            // Lưu tạm thông tin đơn hàng vào TempData để dùng sau khi thanh toán thành công
+            TempData["PendingRental"] = System.Text.Json.JsonSerializer.Serialize(model);
+            TempData["PendingTotalPrice"] = totalPrice.ToString();
+
+            // Tạo request thanh toán VNPay
+            var vnPayModel = new VNPaymentRequestModel
+            {
+                Amount = (double)totalPrice,
+                CreatedDate = DateTime.Now,
+                Description = $"Thanh toan don thue may {device.Name}",
+                FullName = User.Identity.Name ?? "Khach Hang",
+                OrderId = DateTime.Now.ToString("yyMMddHHmmss") + new Random().Next(10, 99).ToString()
+            };
+
+            return Redirect(vnPayService.CreatePaymentUrl(HttpContext, vnPayModel));
+        }
+
+        public async Task<IActionResult> PaymentCallBack([FromServices] TechShare.Services.IVNPayService vnPayService)
+        {
+            var response = vnPayService.PaymentExecute(Request.Query);
+
+            if (response == null || response.VnPayResponseCode != "00")
+            {
+                TempData["ErrorMessage"] = "Lỗi thanh toán VNPay hoặc bạn đã hủy giao dịch.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Thanh toán thành công, ghi nhận đơn hàng
+            if (TempData["PendingRental"] == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy thông tin đơn hàng. Vui lòng thử lại.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = System.Text.Json.JsonSerializer.Deserialize<TechShare.ViewModels.RentalCheckoutViewModel>(TempData["PendingRental"].ToString());
+            var totalPrice = decimal.Parse(TempData["PendingTotalPrice"].ToString());
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var device = await _context.Devices.FindAsync(model.DeviceId);
+            if (device == null) return NotFound();
+
             var rental = new Rental
             {
                 DeviceId = model.DeviceId,
@@ -106,8 +147,8 @@ namespace TechShare.Controllers
                 DeliveryMethod = model.DeliveryMethod,
                 DeliveryAddress = model.DeliveryAddress,
                 TotalPrice = totalPrice,
-                DepositStatus = DepositStatus.DaThanhToan, // Giả lập đã thanh toán cọc qua Momo/VNPay thành công
-                Status = RentalStatus.ChoDuyet // Chờ chủ máy duyệt
+                DepositStatus = DepositStatus.DaThanhToan, 
+                Status = RentalStatus.ChoDuyet 
             };
 
             device.StockQuantity -= model.Quantity;
@@ -115,6 +156,7 @@ namespace TechShare.Controllers
             _context.Rentals.Add(rental);
             await _context.SaveChangesAsync();
 
+            TempData["SuccessMessage"] = $"Thanh toán thành công! Mã giao dịch VNPay: {response.TransactionId}";
             return RedirectToAction("Success", new { id = rental.Id });
         }
 

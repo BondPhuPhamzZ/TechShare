@@ -18,46 +18,113 @@
 
 <div class="container mt-5">
     <div class="row">
-        <!-- Cột Ảnh Thiết Bị -->
-        <div class="col-md-7 mb-4">
-            <div class="card border-0 shadow-sm">
-                <img src="@Model.ImageUrl" class="card-img-top rounded" alt="@Model.Name" style="width: 100%; height: auto; max-height: 500px; object-fit: contain; background-color: #f8f9fa;">
+        <!-- Cột Ảnh Thiết Bị & Thumbnails -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm p-4 rounded-4 text-center" style="background-color: #fff;">
+                <!-- Main Carousel -->
+                <div id="deviceCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+                    <div class="carousel-inner rounded-3 bg-light">
+                        <div class="carousel-item active">
+                            <img src="@Model.ImageUrl" class="d-block w-100 img-fluid" style="height: 350px; object-fit: contain;" alt="@Model.Name">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="@Model.ImageUrl" class="d-block w-100 img-fluid" style="height: 350px; object-fit: contain; filter: brightness(0.95);" alt="@Model.Name - Góc 2">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="@Model.ImageUrl" class="d-block w-100 img-fluid" style="height: 350px; object-fit: contain; filter: contrast(1.1);" alt="@Model.Name - Góc 3">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#deviceCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-dark rounded-circle p-2 opacity-50" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#deviceCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-dark rounded-circle p-2 opacity-50" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                
+                <!-- Thumbnails -->
+                <div class="row g-2 justify-content-center">
+                    <div class="col-4">
+                        <div class="border rounded-3 p-2 bg-light thumb-item border-primary" data-bs-target="#deviceCarousel" data-bs-slide-to="0" style="cursor: pointer;">
+                            <img src="@Model.ImageUrl" class="img-fluid" alt="Thumbnail 1" style="height: 60px; object-fit: contain;">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded-3 p-2 bg-light thumb-item" data-bs-target="#deviceCarousel" data-bs-slide-to="1" style="cursor: pointer; filter: brightness(0.95);">
+                            <img src="@Model.ImageUrl" class="img-fluid" alt="Thumbnail 2" style="height: 60px; object-fit: contain;">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded-3 p-2 bg-light thumb-item" data-bs-target="#deviceCarousel" data-bs-slide-to="2" style="cursor: pointer; filter: contrast(1.1);">
+                            <img src="@Model.ImageUrl" class="img-fluid" alt="Thumbnail 3" style="height: 60px; object-fit: contain;">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Cột Thông Tin & Form Đặt Cọc -->
-        <div class="col-md-5">
-            <div class="card border-0 shadow-sm p-4">
-                <span class="badge bg-secondary mb-2" style="width: fit-content;">@Model.Category.Name</span>
-                <h2 class="fw-bold text-primary mb-3">@Model.Name</h2>
-                <p class="text-muted">@Model.Description</p>
-
-                <hr />
+        <!-- Cột Thông Tin, Specs Grid & Form Đặt Cọc -->
+        <div class="col-md-6">
+            <div class="p-2">
+                <h2 class="fw-bold text-primary mb-2" style="font-size: 2.2rem;">@Model.Name</h2>
                 
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="fs-5">Giá thuê:</span>
-                    <strong class="text-dark fw-bold fs-4">@Model.PricePerDay.ToString("N0") VNĐ / Ngày</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="fs-5">Tiền cọc:</span>
-                    <strong class="text-dark fw-bold fs-5">@Model.DepositAmount.ToString("N0") VNĐ</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-3">
-                    <span class="fs-5">Kho còn:</span>
-                    <strong class="text-success fs-5">@Model.StockQuantity cái</strong>
+                <div class="d-flex align-items-center mb-3">
+                    @{
+                        var reviewsInfo = Model.Rentals?.Where(r => r.Review != null).Select(r => r.Review).ToList() ?? new List<TechShare.Models.Review>();
+                        if (reviewsInfo.Any())
+                        {
+                            var avgRating = reviewsInfo.Average(r => r.Rating);
+                            <span class="text-warning fs-5 me-2">
+                                @(new string('⭐', (int)Math.Round(avgRating)))
+                            </span> 
+                            <span class="text-primary fs-5">@avgRating.ToString("0.0") (@reviewsInfo.Count)</span>
+                        }
+                    }
                 </div>
 
-                <hr />
+                <div class="mb-4">
+                    <strong class="text-primary fw-bold" style="font-size: 2rem;">@Model.PricePerDay.ToString("N0")Đ/ Ngày</strong>
+                </div>
 
+                <!-- Mô tả & Cấu hình -->
+                <div class="mb-4 bg-light p-3 rounded-4 border-0 shadow-sm">
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <h6 class="fw-bold text-dark mb-2">Mô tả thiết bị:</h6>
+                        <p class="text-secondary mb-3" style="line-height: 1.6; white-space: pre-wrap;">@Model.Description</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Specifications))
+                    {
+                        <h6 class="fw-bold text-dark mb-2">Thông số kỹ thuật:</h6>
+                        <ul class="list-unstyled text-secondary mb-0">
+                            @{
+                                var specsList = Model.Specifications.Split(new[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (var spec in specsList)
+                                {
+                                    <li class="mb-1"><i class="bi bi-check2-circle text-primary me-2"></i>@spec.Trim()</li>
+                                }
+                            }
+                        </ul>
+                    }
+                    @if (string.IsNullOrEmpty(Model.Description) && string.IsNullOrEmpty(Model.Specifications))
+                    {
+                        <p class="text-muted fst-italic mb-0">Chưa có thông tin mô tả chi tiết cho thiết bị này.</p>
+                    }
+                </div>
+                
+                <p class="text-muted small mb-4">Tiền cọc: <strong class="text-dark">@Model.DepositAmount.ToString("N0") VNĐ</strong> - Kho còn: <strong class="text-dark">@Model.StockQuantity</strong></p>
 
                 @if (TempData["ErrorMessage"] != null)
                 {
                     <div class="alert alert-danger fw-bold shadow-sm">
-                        <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                        @TempData["ErrorMessage"]
                     </div>
                 }
 
-                <!-- Form giả lập hành động -->
+                <!-- Form Đặt Thuê -->
                 <form asp-controller="Rental" asp-action="Checkout" method="get">
                     <input type="hidden" name="deviceId" value="@Model.Id" />
                     <div class="row g-2 mb-3">
@@ -77,26 +144,25 @@
                     
                     @if (!User.Identity.IsAuthenticated)
                     {
-                        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary w-100 py-2 fw-bold fs-6 shadow-sm">ĐĂNG NHẬP ĐỂ THUÊ THIẾT BỊ</a>
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow-sm text-white border-0">ĐĂNG NHẬP ĐỂ THUÊ</a>
                     }
                     else if (!isVerified)
                     {
                         <div class="alert alert-warning border-warning shadow-sm">
-                            <strong><i class="bi bi-shield-lock me-2"></i>Yêu cầu xác minh danh tính!</strong><br>
+                            <strong>Yêu cầu xác minh danh tính!</strong><br>
                             Bạn cần tải lên ảnh CCCD tại trang <a asp-controller="Profile" asp-action="Index" class="alert-link">Hồ sơ cá nhân</a> để có thể đặt thuê.
                         </div>
-                        <button type="button" class="btn btn-secondary w-100 py-2 fw-bold fs-6 shadow-sm" disabled>
+                        <button type="button" class="btn btn-secondary w-100 py-3 fw-bold fs-5 shadow-sm" disabled>
                             TÀI KHOẢN CHƯA XÁC MINH
                         </button>
                     }
                     else
                     {
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold fs-6 shadow-sm">
-                            TIẾN HÀNH THUÊ VÀ ĐẶT CỌC
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow-sm text-white border-0">
+                            Thuê ngay
                         </button>
                     }
                 </form>
-
             </div>
         </div>
     </div>
@@ -167,5 +233,26 @@
             }
         </div>
     </div>
-
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var carouselEl = document.getElementById('deviceCarousel');
+            var thumbItems = document.querySelectorAll('.thumb-item');
+            
+            if (carouselEl && thumbItems.length > 0) {
+                carouselEl.addEventListener('slide.bs.carousel', function (event) {
+                    // Xóa border-primary ở tất cả thumb
+                    thumbItems.forEach(function(el) {
+                        el.classList.remove('border-primary');
+                    });
+                    // Thêm border-primary vào thumb tương ứng
+                    if(thumbItems[event.to]) {
+                        thumbItems[event.to].classList.add('border-primary');
+                    }
+                });
+            }
+        });
+    </script>
+}

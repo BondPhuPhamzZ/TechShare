@@ -43,9 +43,9 @@
                         <strong>@Model.DepositAmount.ToString("N0") VNĐ</strong>
                     </div>
                     <hr />
-                    <div class="d-flex justify-content-between text-danger fs-5 fw-bold">
-                        <span>Tổng thanh toán lúc này:</span>
-                        <span>@Model.DepositAmount.ToString("N0") VNĐ</span>
+                    <div class="d-flex justify-content-between text-primary fs-5 fw-bold">
+                        <span>Tổng thanh toán:</span>
+                        <span>@ViewBag.TotalPrice.ToString("N0") VNĐ</span>
                     </div>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body p-4">
                         <div class="alert alert-warning shadow-sm border-warning">
-                            <h6 class="alert-heading fw-bold"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> Lưu ý quan trọng trước khi thuê:</h6>
+                            <h6 class="alert-heading fw-bold">Lưu ý quan trọng trước khi thuê:</h6>
                             <ul class="mb-0 small">
                                 <li><strong>Báo lỗi thiết bị:</strong> Bạn có quyền kiểm tra và bấm "Báo Lỗi" trên hệ thống trong vòng <strong>2 giờ đầu tiên</strong> kể từ lúc Shop xác nhận giao máy. Quá 2 giờ, hệ thống sẽ ẩn tính năng này và ghi nhận máy hoạt động bình thường.</li>
                                 <li><strong>Trả máy sớm:</strong> Trong quá trình thuê, nếu bạn trả máy sớm hơn ngày hẹn, phí thuê <strong>vẫn được tính nguyên</strong> theo khoảng thời gian đã thỏa thuận. Vui lòng cân nhắc kỹ số ngày thuê.</li>
@@ -80,14 +80,8 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 bg-primary text-white mb-4">
-                    <div class="card-body text-center p-4">
-                        <h5 class="fw-bold">Thanh toán qua Momo / VNPay (Giả lập)</h5>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-danger w-100 py-3 fs-5 fw-bold shadow">
-                    TÔI ĐÃ CHUYỂN KHOẢN CỌC - GỬI YÊU CẦU THUÊ
+                <button type="submit" class="btn btn-primary w-100 py-3 fs-5 fw-bold shadow">
+                    Thanh toán bằng VNPay
                 </button>
             </form>
         </div>

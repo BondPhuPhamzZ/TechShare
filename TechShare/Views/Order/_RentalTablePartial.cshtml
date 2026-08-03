@@ -59,7 +59,7 @@ else
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                 <div>
                     <span class="badge bg-secondary me-2">#@rental.Id</span>
-                    <small class="text-muted"><i class="bi bi-calendar3"></i> @rental.StartDate.ToString("dd/MM/yyyy") - <strong class="text-danger">@rental.EndDate.ToString("dd/MM/yyyy")</strong></small>
+                    <small class="text-muted"> Thời gian thuê: @rental.StartDate.ToString("dd/MM/yyyy") - <strong class="text-primary">@rental.EndDate.ToString("dd/MM/yyyy")</strong></small>
                 </div>
                 <div>
                     <span class="badge @(GetBadge(rental.Status)) fs-6 px-3 py-2">@(GetStatus(rental.Status))</span>
@@ -131,7 +131,7 @@ else
                 <div class="d-flex justify-content-end align-items-center border-top pt-3 mt-2">
                     <div class="me-auto">
                         <span class="text-muted small">Tổng tiền:</span>
-                        <strong class="text-danger fs-5 ms-1">@rental.TotalPrice.ToString("N0") đ</strong>
+                        <strong class="text-primary fs-5 ms-1">@rental.TotalPrice.ToString("N0") đ</strong>
                     </div>
 
                     @if (rental.Status == TechShare.Enums.RentalStatus.DangThue)
@@ -142,24 +142,24 @@ else
                         {
                             <form asp-controller="Order" asp-action="ReportIssue" method="post" class="d-inline me-2">
                                 <input type="hidden" name="id" value="@rental.Id" />
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn phát hiện máy có lỗi? Đơn sẽ bị khóa để Shop kiểm tra và giải quyết.')"><i class="bi bi-exclamation-triangle"></i> Báo Lỗi</button>
+                                <button type="submit" class="btn btn-outline-primary" onclick="return confirm('Bạn phát hiện máy có lỗi? Đơn sẽ bị khóa để Shop kiểm tra và giải quyết.')">Báo Lỗi</button>
                             </form>
                         }
                         <form asp-controller="Order" asp-action="ReturnDevice" method="post" class="d-inline">
                             <input type="hidden" name="id" value="@rental.Id" />
-                            <button type="submit" class="btn btn-warning" onclick="return confirm('CẢNH BÁO: Trả máy sớm hơn thời hạn vẫn sẽ bị tính nguyên phí thuê. Bạn có chắc chắn muốn báo trả máy?')"><i class="bi bi-arrow-return-left"></i> Trả Máy (Sớm)</button>
+                            <button type="submit" class="btn btn-outline-primary" onclick="return confirm('CẢNH BÁO: Trả máy sớm hơn thời hạn vẫn sẽ bị tính nguyên phí thuê. Bạn có chắc chắn muốn báo trả máy?')">Trả Máy (Sớm)</button>
                         </form>
                     }
                     else if (rental.Status == TechShare.Enums.RentalStatus.HoanTat)
                     {
-                        <a asp-controller="Order" asp-action="Invoice" asp-route-id="@rental.Id" class="btn btn-outline-primary me-2"><i class="bi bi-printer"></i> In Hóa Đơn</a>
+                        <a asp-controller="Order" asp-action="Invoice" asp-route-id="@rental.Id" class="btn btn-outline-primary me-2">In Hóa Đơn</a>
                         if (!rental.IsReviewed)
                         {
-                            <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-outline-warning"><i class="bi bi-star-fill"></i> Đánh giá Sản phẩm</a>
+                            <a asp-controller="Review" asp-action="Create" asp-route-rentalId="@rental.Id" class="btn btn-primary">Đánh giá Sản phẩm</a>
                         }
                         else
                         {
-                            <span class="btn btn-secondary disabled"><i class="bi bi-check-lg"></i> Đã đánh giá</span>
+                            <span class="btn btn-light disabled">Đã đánh giá</span>
                         }
                     }
                     else if (rental.Status == TechShare.Enums.RentalStatus.ChoDuyet || rental.Status == TechShare.Enums.RentalStatus.DaDuyet || rental.Status == TechShare.Enums.RentalStatus.DangGiao)
