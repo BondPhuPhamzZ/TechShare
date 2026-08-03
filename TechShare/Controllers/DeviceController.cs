@@ -232,17 +232,25 @@ namespace TechShare.Controllers
             return RedirectToAction("Devices", "Admin");
         }
 
-        // Xóa (Ẩn) thiết bị
+        // Ẩn/Hiện thiết bị
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> ToggleVisibility(int id)
         {
             var device = await _context.Devices.FindAsync(id);
             if (device != null)
             {
-                device.Status = DeviceStatus.BaoTri;
+                if (device.Status == DeviceStatus.BaoTri)
+                {
+                    device.Status = device.StockQuantity == 0 ? DeviceStatus.HetHang : DeviceStatus.SanSang;
+                    TempData["SuccessMessage"] = "Đã hiển thị lại thiết bị!";
+                }
+                else
+                {
+                    device.Status = DeviceStatus.BaoTri;
+                    TempData["SuccessMessage"] = "Đã tạm ẩn thiết bị!";
+                }
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Đã tạm ẩn thiết bị (Chuyển sang trạng thái Bảo trì)!";
             }
             return RedirectToAction("Devices", "Admin");
         }

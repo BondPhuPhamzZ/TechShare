@@ -89,9 +89,16 @@
                                             data-spec="@item.Specifications">
                                         <i class="bi bi-pencil"></i> Sửa
                                     </button>
-                                    <form asp-controller="Device" asp-action="Delete" method="post" class="d-inline">
+                                    <form asp-controller="Device" asp-action="ToggleVisibility" method="post" class="d-inline">
                                         <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn tạm ẩn thiết bị này?');"><i class="bi bi-trash"></i> Xóa</button>
+                                        @if (item.Status == TechShare.Enums.DeviceStatus.BaoTri)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-success" onclick="return confirm('Bạn muốn hiển thị lại thiết bị này?');"><i class="bi bi-eye"></i> Hiện</button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('Bạn có chắc chắn muốn tạm ẩn thiết bị này?');"><i class="bi bi-eye-slash"></i> Ẩn</button>
+                                        }
                                     </form>
                                 </td>
                             </tr>
