@@ -19,10 +19,10 @@
                     @Model.Name
                 </a>
             </h5>
-            
-            <p class="text-dark fs-6 mb-2" style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; min-height: 1.5rem;" title="@Model.Specifications">
-                @(string.IsNullOrEmpty(Model.Specifications) ? "14\" 16GB RAM" : Model.Specifications)
-            </p>
+
+            <span class="text-truncate fs-6 fw-semibold text-black me-1 opacity-50 mb-2">
+                @Model.Description
+            </span>
             
             <div class="d-flex align-items-center mb-2" style="min-height: 24px;">
                 @{
@@ -30,8 +30,8 @@
                     if (reviews.Any())
                     {
                         var avgRating = reviews.Average(r => r.Rating);
-                        <span class="fs-6 fw-semibold text-dark me-1">@avgRating.ToString("0.0")</span>
-                        <span class="text-dark me-2">(@reviews.Count)</span>
+                        <span class="fs-6 fw-semibold text-warning me-1">@avgRating.ToString("0.0")</span>
+                        <span class="text-warning me-2">(@reviews.Count)</span>
                         <span class="text-warning fs-5">
                             <i class="bi bi-star-fill"></i>
                         </span> 
