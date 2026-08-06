@@ -62,7 +62,7 @@ else
                     <small class="text-muted"> Thời gian thuê: @rental.StartDate.ToString("dd/MM/yyyy") - <strong class="text-primary">@rental.EndDate.ToString("dd/MM/yyyy")</strong></small>
                 </div>
                 <div>
-                    <span class="badge @(GetBadge(rental.Status)) fs-6 px-3 py-2">@(GetStatus(rental.Status))</span>
+                    <rental-status status="@rental.Status" class="fs-6 px-3 py-2"></rental-status>
                 </div>
             </div>
             <div class="card-body">
@@ -176,34 +176,3 @@ else
     }
 }
 
-@functions {
-    public string GetStatus(TechShare.Enums.RentalStatus status)
-    {
-        return status switch
-        {
-            TechShare.Enums.RentalStatus.ChoDuyet => "Chờ duyệt",
-            TechShare.Enums.RentalStatus.DaDuyet => "Đã duyệt",
-            TechShare.Enums.RentalStatus.DangGiao => "Đang giao máy",
-            TechShare.Enums.RentalStatus.DangThue => "Đang Thuê",
-            TechShare.Enums.RentalStatus.ChoTra => "Chờ kiểm tra trả",
-            TechShare.Enums.RentalStatus.HoanTat => "Hoàn Tất",
-            TechShare.Enums.RentalStatus.DaHuy => "Đã Hủy",
-            TechShare.Enums.RentalStatus.TranhChap => "Chờ xử lý sự cố",
-            _ => "Không xác định"
-        };
-    }
-
-    public string GetBadge(TechShare.Enums.RentalStatus status)
-    {
-        return status switch
-        {
-            TechShare.Enums.RentalStatus.ChoDuyet => "bg-warning text-dark",
-            TechShare.Enums.RentalStatus.DaDuyet => "bg-info text-dark",
-            TechShare.Enums.RentalStatus.DangThue => "bg-primary",
-            TechShare.Enums.RentalStatus.HoanTat => "bg-success",
-            TechShare.Enums.RentalStatus.TranhChap => "bg-danger",
-            TechShare.Enums.RentalStatus.DaHuy => "bg-secondary",
-            _ => "bg-secondary"
-        };
-    }
-}

@@ -26,43 +26,13 @@
     <div class="tab-content" id="rentalTabsContent">
         <!-- Đơn Hiện Tại -->
         <div class="tab-pane fade show active" id="active" role="tabpanel" aria-labelledby="active-tab">
-            @await Html.PartialAsync("_RentalTablePartial", Model.ActiveRentals)
+            <partial name="_RentalTablePartial" model="Model.ActiveRentals" />
         </div>
         
         <!-- Lịch Sử Cũ -->
         <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
-            @await Html.PartialAsync("_RentalTablePartial", Model.CompletedRentals)
+            <partial name="_RentalTablePartial" model="Model.CompletedRentals" />
         </div>
     </div>
 </div>
 
-@functions {
-    public string TranslateStatus(TechShare.Enums.RentalStatus status)
-    {
-        return status switch
-        {
-            TechShare.Enums.RentalStatus.ChoDuyet => "Chờ duyệt",
-            TechShare.Enums.RentalStatus.DaDuyet => "Đã duyệt",
-            TechShare.Enums.RentalStatus.DangGiao => "Đang giao máy",
-            TechShare.Enums.RentalStatus.DangThue => "Đang Thuê",
-            TechShare.Enums.RentalStatus.ChoTra => "Chờ kiểm tra trả",
-            TechShare.Enums.RentalStatus.HoanTat => "Hoàn Tất",
-            TechShare.Enums.RentalStatus.DaHuy => "Đã Hủy",
-            TechShare.Enums.RentalStatus.TranhChap => "Đang Tranh Chấp",
-            _ => "Không xác định"
-        };
-    }
-
-    public string GetStatusBadgeClass(TechShare.Enums.RentalStatus status)
-    {
-        return status switch
-        {
-            TechShare.Enums.RentalStatus.ChoDuyet => "bg-warning text-dark",
-            TechShare.Enums.RentalStatus.DaDuyet => "bg-info text-dark",
-            TechShare.Enums.RentalStatus.DangThue => "bg-primary",
-            TechShare.Enums.RentalStatus.HoanTat => "bg-success",
-            TechShare.Enums.RentalStatus.TranhChap => "bg-danger",
-            _ => "bg-secondary"
-        };
-    }
-}

@@ -23,7 +23,7 @@ namespace TechShare.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Checkout(TechShare.ViewModels.RentalCheckoutViewModel model)
+        public async Task<IActionResult> Checkout(ViewModels.RentalCheckoutViewModel model)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             
@@ -76,7 +76,7 @@ namespace TechShare.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmCheckout(TechShare.ViewModels.RentalCheckoutViewModel model, [FromServices] TechShare.Services.IVNPayService vnPayService)
+        public async Task<IActionResult> ConfirmCheckout(ViewModels.RentalCheckoutViewModel model, [FromServices] Services.IVNPayService vnPayService)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
@@ -113,7 +113,7 @@ namespace TechShare.Controllers
             return Redirect(vnPayService.CreatePaymentUrl(HttpContext, vnPayModel));
         }
 
-        public async Task<IActionResult> PaymentCallBack([FromServices] TechShare.Services.IVNPayService vnPayService)
+        public async Task<IActionResult> PaymentCallBack([FromServices] Services.IVNPayService vnPayService)
         {
             var response = vnPayService.PaymentExecute(Request.Query);
 
@@ -130,7 +130,7 @@ namespace TechShare.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var model = System.Text.Json.JsonSerializer.Deserialize<TechShare.ViewModels.RentalCheckoutViewModel>(TempData["PendingRental"].ToString());
+            var model = System.Text.Json.JsonSerializer.Deserialize<ViewModels.RentalCheckoutViewModel>(TempData["PendingRental"].ToString());
             var totalPrice = decimal.Parse(TempData["PendingTotalPrice"].ToString());
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
