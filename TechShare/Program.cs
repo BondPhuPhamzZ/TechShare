@@ -87,14 +87,41 @@ builder.Services.AddAuthentication("Cookies")
         {
             try
             {
-                var master = new SqlConnectionStringBuilder(connectionString)
+                var configured = new SqlConnectionStringBuilder(connectionString);
+                var databaseName = configured.InitialCatalog;
+                var master = new SqlConnectionStringBuilder(configured.ConnectionString)
                 {
                     InitialCatalog = "master",
                     ConnectTimeout = 2
                 };
                 master.Remove("AttachDbFilename");
-                using var connection = new SqlConnection(master.ConnectionString);
-                connection.Open();
+
+                using (var masterConnection = new SqlConnection(master.ConnectionString))
+                {
+                    masterConnection.Open();
+                    using var command = masterConnection.CreateCommand();
+                    command.CommandText = "SELECT state_desc FROM sys.databases WHERE name = @databaseName;";
+                    command.Parameters.AddWithValue("@databaseName", databaseName);
+                    var state = command.ExecuteScalar() as string;
+
+                    // A missing database is a valid first-run state: the seed
+                    // initializer can create it. An existing database must be
+                    // ONLINE and reachable before selecting SQL Server; this
+                    // avoids crashing startup when a stale LocalDB database is
+                    // present but cannot accept connections.
+                    if (string.IsNullOrWhiteSpace(state))
+                    {
+                        return true;
+                    }
+
+                    if (!state.Equals("ONLINE", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                }
+
+                using var databaseConnection = new SqlConnection(configured.ConnectionString);
+                databaseConnection.Open();
                 return true;
             }
             catch (Exception)
