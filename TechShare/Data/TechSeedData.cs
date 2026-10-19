@@ -1,3 +1,5 @@
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using TechShare.Models;
 using TechShare.Enums;
 using System.Linq;
@@ -9,7 +11,7 @@ namespace TechShare.Data
     {
         public static void Initialize(TechShareDbContext context)
         {
-            context.Database.EnsureCreated();
+            EnsureDatabaseAvailable(context);
 
             if (context.Categories.Any())
             {
@@ -46,6 +48,88 @@ namespace TechShare.Data
                 new Device{ Name="Micro thu âm Rode Wireless GO II", Description="Thu âm 2 người cùng lúc, lọc ồn siêu tốt.", PricePerDay = 150000, DepositAmount = 4000000, StockQuantity = 2, Status = DeviceStatus.SanSang, CategoryId = 3, ImageUrl = "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=600&fit=crop" }
             );
             context.SaveChanges();
+        }
+
+        private static void EnsureDatabaseAvailable(TechShareDbContext context)
+        {
+            if (context.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                context.Database.EnsureCreated();
+                return;
+            }
+
+            // A previous LocalDB run can leave TechShareDb.mdf on disk while the
+            // database is no longer attached to the LocalDB instance. In that
+            // state EnsureCreated() tries to create the same file again and the
+            // application terminates with SQL error 5170 (0xe0434352 at the
+            // Windows process level). Attach the existing file first.
+            try
+            {
+                if (context.Database.CanConnect())
+                {
+                    return;
+                }
+
+                AttachExistingLocalDbFile(context);
+                context.Database.EnsureCreated();
+            }
+            catch (SqlException ex) when (IsExistingDatabaseFileError(ex))
+            {
+                AttachExistingLocalDbFile(context);
+                context.Database.EnsureCreated();
+            }
+        }
+
+        private static void AttachExistingLocalDbFile(TechShareDbContext context)
+        {
+            var source = context.Database.GetDbConnection().ConnectionString;
+            var builder = new SqlConnectionStringBuilder(source);
+            var databaseName = string.IsNullOrWhiteSpace(builder.InitialCatalog)
+                ? "TechShareDb"
+                : builder.InitialCatalog;
+
+            var mdfPath = builder.AttachDBFilename;
+            if (string.IsNullOrWhiteSpace(mdfPath))
+            {
+                mdfPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    $"{databaseName}.mdf");
+            }
+
+            if (!File.Exists(mdfPath))
+            {
+                // There is no orphaned file to attach; the normal EnsureCreated
+                // path will create a new LocalDB database.
+                return;
+            }
+
+            var masterBuilder = new SqlConnectionStringBuilder(source)
+            {
+                InitialCatalog = "master",
+                ConnectTimeout = 5
+            };
+            masterBuilder.Remove("AttachDbFilename");
+
+            using var connection = new SqlConnection(masterBuilder.ConnectionString);
+            connection.Open();
+
+            var safeDatabaseName = databaseName.Replace("]", "]]", StringComparison.Ordinal);
+            // SQL Server does not allow a parameter in the FILENAME clause of
+            // CREATE DATABASE. Keep the database name parameterized for the
+            // existence check, and escape the local path before embedding it
+            // as a Unicode SQL string literal.
+            var safeMdfPath = mdfPath.Replace("'", "''", StringComparison.Ordinal);
+            using var command = connection.CreateCommand();
+            command.CommandText = $"IF DB_ID(@databaseName) IS NULL " +
+                                  $"CREATE DATABASE [{safeDatabaseName}] ON (FILENAME = N'{safeMdfPath}') FOR ATTACH_REBUILD_LOG;";
+            command.Parameters.AddWithValue("@databaseName", databaseName);
+            command.ExecuteNonQuery();
+        }
+
+        private static bool IsExistingDatabaseFileError(SqlException exception)
+        {
+            return exception.Number == 5170 ||
+                   exception.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
